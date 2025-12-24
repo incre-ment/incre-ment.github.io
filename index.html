@@ -11,16 +11,23 @@
     
     .gallery { 
       display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+      /* Increased the min-width so the rectangles don't get too tiny */
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
       gap: 30px; 
-      max-width: 1200px; 
+      max-width: 1400px; 
       margin: 0 auto; 
     }
 
     .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
     
     /* This ensures all your shaders stay square and responsive */
-    canvas { width: 100%; aspect-ratio: 1 / 1; display: block; background-color: #000; }
+    canvas { 
+      width: 100%; 
+      /* Change this from 1/1 to 16/9 */
+      aspect-ratio: 16 / 9; 
+      display: block; 
+      background-color: #000; 
+    }
     
     .card-info { padding: 15px; border-top: 1px solid #222; }
     .card-title { font-size: 0.9rem; margin: 0; color: #ddd; letter-spacing: 1px; }
