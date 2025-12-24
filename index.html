@@ -18,6 +18,21 @@
       margin: 0 auto; 
     }
 
+    .card-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: #666; /* Subtle grey */
+  text-decoration: none;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.card-link:hover {
+  color: #fff; /* Brightens up when you hover over it */
+}
+
     .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
     
     /* This ensures all your shaders stay square and responsive */
@@ -39,11 +54,14 @@
     <h1>incre_ment</h1>
   </header>
 
-  <main class="gallery">
-    <div class="card">
-      <canvas id="canvas-triangles"></canvas>
-      <div class="card-info"><p class="card-title">001: ROTATING TRIANGLES</p></div>
-    </div>
+<main class="gallery">
+<div class="card">
+  <canvas id="canvas-triangles"></canvas>
+  <div class="card-info">
+    <p class="card-title">001: ROTATING TRIANGLES</p>
+    <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">View on Shadertoy →</a>
+  </div>
+</div>
 
 <div class="card">
   <canvas id="canvas-tunnel"></canvas>
