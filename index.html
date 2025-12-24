@@ -5,23 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>incre_ment</title>
   
-  <script src="https://unpkg.com/glslCanvas/dist/GlslCanvas.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/glslCanvas/0.2.6/GlslCanvas.min.js"></script>
 
   <style>
     body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
     .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
     .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
     
-    /* Ensure the canvas is visible */
     #shader-canvas {
       width: 100%;
       aspect-ratio: 1 / 1;
       display: block;
-      background-color: blue; /* If you see BLUE, the shader hasn't taken over yet */
+      background-color: #222; /* Back to dark grey */
     }
-
     .card-info { padding: 15px; }
-    .card-title { font-size: 1rem; margin: 0; color: #ddd; }
   </style>
 </head>
 <body>
@@ -34,37 +31,35 @@
     <div class="card">
       <canvas id="shader-canvas" width="500" height="500"></canvas>
       <div class="card-info">
-        <p class="card-title">Grey Test Shader</p>
+        <p class="card-title">Test Shader</p>
       </div>
     </div>
   </main>
 
   <script>
-    // This function waits for the library AND the window to be ready
-    window.addEventListener('load', function() {
+    // We check every 100ms if the library is ready
+    const startShader = () => {
       const canvas = document.getElementById('shader-canvas');
       
+      // A simple "Rose" color test
       const shaderCode = `
         precision mediump float;
-        uniform vec2 u_resolution;
         void main() {
-            gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);
+            gl_FragColor = vec4(0.6, 0.2, 0.3, 1.0);
         }
       `;
 
-      try {
-        // If GlslCanvas exists in the global window (from the script tag)
-        if (typeof GlslCanvas !== 'undefined') {
-          const sandbox = new GlslCanvas(canvas);
-          sandbox.load(shaderCode);
-          console.log("SUCCESS: GlslCanvas loaded and shader injected.");
-        } else {
-          console.error("ERROR: GlslCanvas library not found.");
-        }
-      } catch (err) {
-        console.error("SHADER ERROR:", err);
+      if (typeof GlslCanvas !== 'undefined') {
+        const sandbox = new GlslCanvas(canvas);
+        sandbox.load(shaderCode);
+        console.log("Shader injected!");
+      } else {
+        console.log("Waiting for library...");
+        setTimeout(startShader, 100);
       }
-    });
+    };
+
+    window.addEventListener('load', startShader);
   </script>
 
 </body>
