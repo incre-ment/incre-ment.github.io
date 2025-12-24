@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>incre_ment</title>
   
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/glslCanvas/0.2.6/GlslCanvas.js"></script>
+  <script src="https://unpkg.com/glslCanvas/dist/GlslCanvas.js"></script>
 
   <style>
     /* Base Styles */
@@ -61,10 +61,9 @@
       border-color: #444;
     }
 
-    /* Target all media types: Canvas, Image, and Iframe */
-    .card iframe,
-    .card img,
-    .glslCanvas {
+    /* Target the Shader Canvas and Images */
+    .glslCanvas, 
+    .card img {
       width: 100%;
       aspect-ratio: 1 / 1;
       border: none;
@@ -99,13 +98,6 @@
       font-size: 0.8rem;
     }
   </style>
-</head>
-<body>
-
-  <header>
-    <h1>incre_ment</h1>
-    <p class="subtitle">Generative Art & Fragment Shaders</p>
-  </header>
 
   <script id="tri-shader" type="x-shader/x-fragment">
     #ifdef GL_ES
@@ -116,10 +108,8 @@
     uniform float u_time;
 
     #define rotation(angle) mat2(cos(angle), -sin(angle), sin(angle), cos(angle))
-
     float TAU = 2.*3.14159;
 
-    // Equilateral Triangle Signed Distance Function
     float eqTri( in vec2 p, in float r ) {
         const float k = sqrt(3.0);
         p.x = abs(p.x) - r;
@@ -130,16 +120,11 @@
     }
 
     void main() {
-        // Translation: gl_FragCoord and u_resolution
         vec2 uv = ( gl_FragCoord.xy - .5 * u_resolution.xy ) / u_resolution.y;
         vec3 col = vec3(0.);
-        
-        // Translation: u_time replaces iTime
         float t = fract(.1 * u_time);
-        
         uv *= rotation(3. * TAU * (.3 - clamp(length(uv),0.,.3)));
         float s = -1.;
-        
         for(float i = 0.; i < 3.; i++){
           float rad = .4 / pow(2.,i) * (.9 - .2 * i);
           uv *= rotation(-2. * s * (i + 1.) * TAU * t);
@@ -147,15 +132,20 @@
           s *= -1.;
           col += .004 / abs(tri);
         }
-        
         gl_FragColor = vec4(col, 1.0);
     }
   </script>
+</head>
+<body>
+
+  <header>
+    <h1>incre_ment</h1>
+    <p class="subtitle">Generative Art & Fragment Shaders</p>
+  </header>
 
   <main class="gallery">
-
     <div class="card">
-      <canvas class="glslCanvas" data-fragment-url="#tri-shader"></canvas>
+      <canvas class="glslCanvas" id="canvas-tri" data-fragment-url="#tri-shader"></canvas>
       <div class="card-info">
         <p class="card-title">Rotating Triangles</p>
         <span class="card-tag">Native GLSL</span>
@@ -169,12 +159,20 @@
         <span class="card-tag">GLSL / Processing</span>
       </div>
     </div>
-
   </main>
 
   <footer>
     <p>&copy; 2025 incre_ment</p>
   </footer>
+
+  <script>
+    window.addEventListener('load', function() {
+      const canvas = document.getElementById('canvas-tri');
+      const shaderCode = document.getElementById('tri-shader').textContent;
+      const sandbox = new GlslCanvas(canvas);
+      sandbox.load(shaderCode);
+    });
+  </script>
 
 </body>
 </html>
