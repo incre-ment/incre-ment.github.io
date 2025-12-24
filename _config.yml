@@ -1,0 +1,15 @@
+# Site Settings
+title: incre-ment | Creative Coding
+description: A gallery of GLSL shaders and Processing animations.
+theme: jekyll-theme-minimal
+
+# Navigation & Optimization
+show_downloads: false
+google_analytics: # Leave blank for now
+
+# Important for Shaders:
+# This prevents GitHub from accidentally ignoring files with dots or underscores
+include: [".well-known", "_assets"]
+
+# Site URL (Update this to your new name)
+url: "https://incre-ment.github.io"
