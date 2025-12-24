@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>incre_ment</title>
-  
-  <script src="https://unpkg.com/glslCanvas/dist/GlslCanvas.js"></script>
-
   <style>
     /* Base Styles */
     body {
@@ -36,7 +33,6 @@
       letter-spacing: 1px;
     }
 
-    /* The Grid */
     .gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -45,7 +41,6 @@
       margin: 0 auto;
     }
 
-    /* Art Card */
     .card {
       background: #151515;
       border: 1px solid #222;
@@ -61,20 +56,18 @@
       border-color: #444;
     }
 
-    /* Target the Shader Canvas and Images */
-    .glslCanvas, 
+    /* Target the Canvas and Images */
+    #shader-canvas, 
     .card img {
       width: 100%;
       aspect-ratio: 1 / 1;
-      border: none;
       display: block;
       object-fit: cover;
+      background-color: #000; /* Shows black while loading */
     }
 
     .card-info {
       padding: 15px;
-      display: flex;
-      flex-direction: column;
     }
 
     .card-title {
@@ -98,43 +91,6 @@
       font-size: 0.8rem;
     }
   </style>
-
-  <script id="tri-shader" type="x-shader/x-fragment">
-    #ifdef GL_ES
-    precision mediump float;
-    #endif
-
-    uniform vec2 u_resolution;
-    uniform float u_time;
-
-    #define rotation(angle) mat2(cos(angle), -sin(angle), sin(angle), cos(angle))
-    float TAU = 2.*3.14159;
-
-    float eqTri( in vec2 p, in float r ) {
-        const float k = sqrt(3.0);
-        p.x = abs(p.x) - r;
-        p.y = p.y + r/k;
-        if( p.x+k*p.y>0.0 ) p = vec2(p.x-k*p.y,-k*p.x-p.y)/2.0;
-        p.x -= clamp( p.x, -2.0*r, 0.0 );
-        return -length(p)*sign(p.y);
-    }
-
-    void main() {
-        vec2 uv = ( gl_FragCoord.xy - .5 * u_resolution.xy ) / u_resolution.y;
-        vec3 col = vec3(0.);
-        float t = fract(.1 * u_time);
-        uv *= rotation(3. * TAU * (.3 - clamp(length(uv),0.,.3)));
-        float s = -1.;
-        for(float i = 0.; i < 3.; i++){
-          float rad = .4 / pow(2.,i) * (.9 - .2 * i);
-          uv *= rotation(-2. * s * (i + 1.) * TAU * t);
-          float tri = eqTri(uv, rad);
-          s *= -1.;
-          col += .004 / abs(tri);
-        }
-        gl_FragColor = vec4(col, 1.0);
-    }
-  </script>
 </head>
 <body>
 
@@ -145,7 +101,7 @@
 
   <main class="gallery">
     <div class="card">
-      <canvas class="glslCanvas" id="canvas-tri" data-fragment-url="#tri-shader"></canvas>
+      <canvas id="shader-canvas" width="500" height="500"></canvas>
       <div class="card-info">
         <p class="card-title">Rotating Triangles</p>
         <span class="card-tag">Native GLSL</span>
@@ -153,7 +109,7 @@
     </div>
 
     <div class="card">
-      <img src="shader_loop.gif" alt="Neon Pulse animation" loading="lazy">
+      <img src="shader_loop.gif" alt="Neon Pulse animation">
       <div class="card-info">
         <p class="card-title">Neon Pulse</p>
         <span class="card-tag">GLSL / Processing</span>
@@ -165,13 +121,59 @@
     <p>&copy; 2025 incre_ment</p>
   </footer>
 
-  <script>
-    window.addEventListener('load', function() {
-      const canvas = document.getElementById('canvas-tri');
-      const shaderCode = document.getElementById('tri-shader').textContent;
+  <script type="module">
+    // This imports the library as a modern ES Module
+    import GlslCanvas from 'https://cdn.skypack.dev/glsl-canvas';
+
+    const shaderCode = `
+      #ifdef GL_ES
+      precision mediump float;
+      #endif
+
+      uniform vec2 u_resolution;
+      uniform float u_time;
+
+      #define rotation(angle) mat2(cos(angle), -sin(angle), sin(angle), cos(angle))
+      float TAU = 2.*3.14159;
+
+      float eqTri( in vec2 p, in float r ) {
+          const float k = sqrt(3.0);
+          p.x = abs(p.x) - r;
+          p.y = p.y + r/k;
+          if( p.x+k*p.y>0.0 ) p = vec2(p.x-k*p.y,-k*p.x-p.y)/2.0;
+          p.x -= clamp( p.x, -2.0*r, 0.0 );
+          return -length(p)*sign(p.y);
+      }
+
+      void main() {
+          vec2 uv = ( gl_FragCoord.xy - .5 * u_resolution.xy ) / u_resolution.y;
+          vec3 col = vec3(0.);
+          float t = fract(.1 * u_time);
+          uv *= rotation(3. * TAU * (.3 - clamp(length(uv),0.,.3)));
+          float s = -1.;
+          for(float i = 0.; i < 3.; i++){
+            float rad = .4 / pow(2.,i) * (.9 - .2 * i);
+            uv *= rotation(-2. * s * (i + 1.) * TAU * t);
+            float tri = eqTri(uv, rad);
+            s *= -1.;
+            col += .004 / abs(tri);
+          }
+          gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    // 1. Grab the canvas
+    const canvas = document.getElementById('shader-canvas');
+    
+    try {
+      // 2. Initialize the sandbox
       const sandbox = new GlslCanvas(canvas);
+      // 3. Force-load the code
       sandbox.load(shaderCode);
-    });
+      console.log("Shader initialized successfully");
+    } catch (err) {
+      console.error("Shader failed to load:", err);
+    }
   </script>
 
 </body>
