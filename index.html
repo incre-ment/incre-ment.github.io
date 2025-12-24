@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +43,7 @@
 
     .card-link:hover { color: #fff; }
 
-    /* FPS Counter Styling */
+    /* Polished Grayscale Performance Counter */
     .fps-counter {
       position: absolute;
       top: 15px;
@@ -52,6 +53,7 @@
       color: #666;
       opacity: 0.8;
       letter-spacing: 0.5px;
+      text-align: right;
     }
   </style>
 </head>
@@ -66,7 +68,7 @@
       <canvas id="canvas-triangles"></canvas>
       <div class="card-info">
         <p class="card-title">001: LOADING LOADING LOADING</p>
-        <div class="fps-counter" id="fps-canvas-triangles">-- FPS</div>
+        <div class="fps-counter" id="fps-canvas-triangles">-- FPS · --ms</div>
         <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
@@ -75,7 +77,7 @@
       <canvas id="canvas-tunnel"></canvas>
       <div class="card-info">
         <p class="card-title">002: DARKNESS CONDUIT MARK II</p>
-        <div class="fps-counter" id="fps-canvas-tunnel">-- FPS</div>
+        <div class="fps-counter" id="fps-canvas-tunnel">-- FPS · --ms</div>
         <a href="https://www.shadertoy.com/view/Wc3yRr" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
@@ -84,7 +86,7 @@
       <canvas id="canvas-noiserings"></canvas>
       <div class="card-info">
         <p class="card-title">003: SIMPLEX NOISE RINGS</p>
-        <div class="fps-counter" id="fps-canvas-noiserings">-- FPS</div>
+        <div class="fps-counter" id="fps-canvas-noiserings">-- FPS · --ms</div>
         <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
@@ -93,7 +95,7 @@
       <canvas id="canvas-starfield"></canvas>
       <div class="card-info">
          <p class="card-title">004: A RIPPLE ACROSS</p>
-         <div class="fps-counter" id="fps-canvas-starfield">-- FPS</div>
+         <div class="fps-counter" id="fps-canvas-starfield">-- FPS · --ms</div>
          <a href="https://www.shadertoy.com/view/43lyzH" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
@@ -135,22 +137,29 @@
       const timeLoc = gl.getUniformLocation(program, "u_time");
       const resLoc = gl.getUniformLocation(program, "u_resolution");
 
-      // --- FPS Tracking Variables ---
+      // --- Performance Metrics Variables ---
       let lastTime = 0;
       let frameCount = 0;
       let lastFpsUpdate = 0;
 
       function render(time) {
-        // FPS Calculation
+        // Delta time is the ms between this frame and the last
         const deltaTime = time - lastTime;
         lastTime = time;
         frameCount++;
 
-        // Update FPS readout every 500ms so it's readable
+        // Update display every 500ms
         if (time - lastFpsUpdate > 500) {
           const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-          fpsDisplay.innerText = `${fps} FPS`;
-          fpsDisplay.style.opacity = fps < 30 ? "0.4" : "0.8";
+          
+          // avgTime gives a readable look at the GPU cost
+          const avgTime = deltaTime.toFixed(1);
+          
+          fpsDisplay.innerText = `${fps} FPS · ${avgTime}ms`;
+          
+          // Visual "Health" feedback via Opacity (Grayscale style)
+          fpsDisplay.style.opacity = fps < 45 ? "0.4" : "0.8";
+          
           lastFpsUpdate = time;
           frameCount = 0;
         }
