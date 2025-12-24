@@ -1,132 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>incre_ment</title>
-    <style>
-        /* Base Styles */
-        body { 
-            background-color: #0a0a0a; 
-            color: #f0f0f0; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            line-height: 1.6;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>incre_ment</title>
+  <style>
+    /* Base Styles */
+    body {
+      background-color: #0a0a0a;
+      color: #f0f0f0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
 
-        h1 { 
-            font-weight: 200; 
-            letter-spacing: 4px; 
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-       
-        /* Add this to your existing CSS */
-       .card iframe {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border: none;
-            display: block;
-        }
-        .subtitle {
-            color: #666;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
+    h1 {
+      font-weight: 200;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
 
-        /* The Grid */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
 
-        /* Art Card */
-        .card {
-            background: #151515;
-            border: 1px solid #222;
-            border-radius: 4px;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
+    /* The Grid */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: #444;
-        }
+    /* Art Card */
+    .card {
+      background: #151515;
+      border: 1px solid #222;
+      border-radius: 4px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .card img {
-            width: 100%;
-            display: block;
-            aspect-ratio: 1 / 1; /* Keeps everything as a square */
-            object-fit: cover;
-        }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #444;
+    }
 
-        .card-info {
-            padding: 15px;
-        }
+    .card iframe,
+    .card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: none;
+      display: block;
+      object-fit: cover;
+    }
 
-        .card-title {
-            font-size: 1rem;
-            margin: 0;
-            color: #ddd;
-        }
+    .card-info {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .card-tag {
-            font-size: 0.7rem;
-            color: #555;
-            text-transform: uppercase;
-            margin-top: 5px;
-            display: block;
-        }
+    .card-title {
+      font-size: 1rem;
+      margin: 0;
+      color: #ddd;
+    }
 
-        footer {
-            text-align: center;
-            margin-top: 80px;
-            color: #444;
-            font-size: 0.8rem;
-        }
-    </style>
+    .card-tag {
+      font-size: 0.7rem;
+      color: #555;
+      text-transform: uppercase;
+      margin-top: 5px;
+      display: block;
+    }
+
+    .card-link {
+      font-size: 0.7rem;
+      color: #4a9eff;
+      text-decoration: none;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .card-link:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      color: #444;
+      font-size: 0.8rem;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>incre_ment</h1>
-        <p class="subtitle">Generative Art & Fragment Shaders</p>
-    </header>
+  <header>
+    <h1>incre_ment</h1>
+    <p class="subtitle">Generative Art & Fragment Shaders</p>
+  </header>
 
-    <main class="gallery">
+  <main class="gallery">
 
     <div class="card">
-      <iframe src="https://www.shadertoy.com/embed/M3XBz4?gui=false&t=10&paused=false&muted=true" allowfullscreen></iframe>
-        <div class="card-info">
-          <p class="card-title">Simplex Noise Rings</p>
-          <span class="card-tag">Shadertoy</span>
-          <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" style="font-size: 0.7rem; color: #4a9eff; text-decoration: none; margin-top: 5px; display: inline-block;">View Source ↗</a>
-       </div>
+      <iframe 
+        src="https://www.shadertoy.com/embed/M3XBz4?gui=false&t=10&paused=false&muted=true" 
+        allowfullscreen 
+        loading="lazy">
+      </iframe>
+      <div class="card-info">
+        <p class="card-title">Simplex Noise Rings</p>
+        <span class="card-tag">Shadertoy</span>
+        <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View Source ↗</a>
+      </div>
     </div>
 
-        <div class="card">
-            <img src="shader_loop.gif" alt="Shadertoy capture">
-            <div class="card-info">
-                <p class="card-title">Neon Pulse</p>
-                <span class="card-tag">GLSL / Shadertoy</span>
-            </div>
-        </div>
+    <div class="card">
+      <img src="shader_loop.gif" alt="Neon Pulse animation" loading="lazy">
+      <div class="card-info">
+        <p class="card-title">Neon Pulse</p>
+        <span class="card-tag">GLSL / Processing</span>
+      </div>
+    </div>
 
-        </main>
+  </main>
 
-    <footer>
-        <p>&copy; 2026 incre_ment</p>
-    </footer>
+  <footer>
+    <p>&copy; 2026 incre_ment</p>
+  </footer>
 
 </body>
 </html>
