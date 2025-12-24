@@ -47,8 +47,14 @@
 
 <div class="card">
   <canvas id="canvas-tunnel"></canvas>
-  <div class="card-info"><p class="card-title">003: STAR CABLE TUNNEL</p></div>
+  <div class="card-info"><p class="card-title">002: STAR CABLE TUNNEL</p></div>
 </div>
+
+<div class="card">
+  <canvas id="canvas-noiserings"></canvas>
+  <div class="card-info"><p class="card-title">003: NOISE RINGS</p></div>
+</div>
+    
   </main>
 
   <script type="module">
@@ -110,6 +116,7 @@
     // Just add a new line here for every shader you want to load!
     initShader('canvas-triangles', 'triangles.frag');
     initShader('canvas-tunnel', 'tunnel.frag'); 
+    initShader('canvas-noiserings', 'noiseRings.frag');
 
   </script>
 </body>
