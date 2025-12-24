@@ -1,3 +1,7 @@
+To make the date update automatically, we’ll add a tiny script that formats the current date into that specific YYYY.MM.DD style. I’ve also applied the "Pulse" heartbeat to the status and unified the entire code.
+
+Here is your complete, updated gallery code.
+HTML
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,9 +11,31 @@
   <title>incre_ment | gallery</title>
   <style>
     body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
-    header { text-align: center; margin-bottom: 60px; }
-    h1 { font-weight: 200; letter-spacing: 4px; text-transform: uppercase; }
     
+    /* Header & Metadata Styling */
+    header { text-align: center; margin-bottom: 80px; }
+    h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 10px; }
+    
+    .header-metadata {
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: #555;
+      letter-spacing: 2px;
+      word-spacing: 5px;
+      text-transform: uppercase;
+    }
+
+    .status-active {
+      color: #888;
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    /* Gallery Grid */
     .gallery { 
       display: grid; 
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
@@ -43,7 +69,7 @@
 
     .card-link:hover { color: #fff; }
 
-    /* Polished Grayscale Performance Counter */
+    /* Performance Metrics */
     .fps-counter {
       position: absolute;
       top: 15px;
@@ -61,6 +87,12 @@
 
   <header>
     <h1>incre_ment</h1>
+    <div class="header-metadata">
+      STATUS: <span class="status-active">ACTIVE</span> // 
+      GPU_LOAD: STABLE // 
+      NODES: 04 // 
+      <span id="current-date">0000.00.00</span>
+    </div>
   </header>
 
   <main class="gallery">
@@ -102,6 +134,15 @@
   </main>
 
   <script type="module">
+    // --- Auto-Date Script ---
+    const dateDisplay = document.getElementById('current-date');
+    const now = new Date();
+    const formattedDate = now.getFullYear() + '.' + 
+                          String(now.getMonth() + 1).padStart(2, '0') + '.' + 
+                          String(now.getDate()).padStart(2, '0');
+    dateDisplay.innerText = formattedDate;
+
+    // --- Master Shader Engine ---
     async function initShader(canvasId, fragFileName) {
       const canvas = document.getElementById(canvasId);
       const fpsDisplay = document.getElementById(`fps-${canvasId}`);
@@ -110,7 +151,6 @@
 
       const response = await fetch(`shaders/${fragFileName}`);
       const fragmentSource = await response.text();
-
       const vertexSource = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
 
       function createShader(gl, type, source) {
@@ -137,29 +177,20 @@
       const timeLoc = gl.getUniformLocation(program, "u_time");
       const resLoc = gl.getUniformLocation(program, "u_resolution");
 
-      // --- Performance Metrics Variables ---
       let lastTime = 0;
       let frameCount = 0;
       let lastFpsUpdate = 0;
 
       function render(time) {
-        // Delta time is the ms between this frame and the last
         const deltaTime = time - lastTime;
         lastTime = time;
         frameCount++;
 
-        // Update display every 500ms
         if (time - lastFpsUpdate > 500) {
           const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-          
-          // avgTime gives a readable look at the GPU cost
           const avgTime = deltaTime.toFixed(1);
-          
           fpsDisplay.innerText = `${fps} FPS · ${avgTime}ms`;
-          
-          // Visual "Health" feedback via Opacity (Grayscale style)
           fpsDisplay.style.opacity = fps < 45 ? "0.4" : "0.8";
-          
           lastFpsUpdate = time;
           frameCount = 0;
         }
@@ -177,6 +208,7 @@
       requestAnimationFrame(render);
     }
 
+    // --- Activation ---
     initShader('canvas-triangles', 'triangles.frag');
     initShader('canvas-tunnel', 'tunnel.frag'); 
     initShader('canvas-noiserings', 'noiseRings.frag');
