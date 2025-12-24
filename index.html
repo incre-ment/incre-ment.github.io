@@ -11,41 +11,47 @@
     
     .gallery { 
       display: grid; 
-      /* Increased the min-width so the rectangles don't get too tiny */
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
       gap: 30px; 
       max-width: 1400px; 
       margin: 0 auto; 
     }
 
-    .card-link {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 0.7rem;
-  color: #666; /* Subtle grey */
-  text-decoration: none;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: color 0.3s ease;
-}
-
-.card-link:hover {
-  color: #fff; /* Brightens up when you hover over it */
-}
-
     .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
     
-    /* This ensures all your shaders stay square and responsive */
     canvas { 
       width: 100%; 
-      /* Change this from 1/1 to 16/9 */
       aspect-ratio: 16 / 9; 
       display: block; 
       background-color: #000; 
     }
     
-    .card-info { padding: 15px; border-top: 1px solid #222; }
+    .card-info { padding: 15px; border-top: 1px solid #222; position: relative; }
     .card-title { font-size: 0.9rem; margin: 0; color: #ddd; letter-spacing: 1px; }
+
+    .card-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: #666;
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+
+    .card-link:hover { color: #fff; }
+
+    /* FPS Counter Styling */
+    .fps-counter {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: #00ff00;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
@@ -54,56 +60,56 @@
     <h1>incre_ment</h1>
   </header>
 
-<main class="gallery">
-<div class="card">
-  <canvas id="canvas-triangles"></canvas>
-  <div class="card-info">
-    <p class="card-title">001: ROTATING TRIANGLES</p>
-    <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">View on Shadertoy →</a>
-  </div>
-</div>
+  <main class="gallery">
+    <div class="card">
+      <canvas id="canvas-triangles"></canvas>
+      <div class="card-info">
+        <p class="card-title">001: ROTATING TRIANGLES</p>
+        <div class="fps-counter" id="fps-canvas-triangles">-- FPS</div>
+        <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">View on Shadertoy →</a>
+      </div>
+    </div>
 
-<div class="card">
-  <canvas id="canvas-tunnel"></canvas>
-  <div class="card-info">
-    <p class="card-title">002: STAR CABLE TUNNEL</p>
-    <a href="https://www.shadertoy.com/view/Wc3yRr" target="_blank" class="card-link">View on Shadertoy →</a>
-  </div>
-</div>
+    <div class="card">
+      <canvas id="canvas-tunnel"></canvas>
+      <div class="card-info">
+        <p class="card-title">002: STAR CABLE TUNNEL</p>
+        <div class="fps-counter" id="fps-canvas-tunnel">-- FPS</div>
+        <a href="https://www.shadertoy.com/view/Wc3yRr" target="_blank" class="card-link">View on Shadertoy →</a>
+      </div>
+    </div>
 
-<div class="card">
-  <canvas id="canvas-noiserings"></canvas>
-  <div class="card-info">
-    <p class="card-title">003: NOISE RINGS</p>
-    <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View on Shadertoy →</a>
-  </div>
-</div>
+    <div class="card">
+      <canvas id="canvas-noiserings"></canvas>
+      <div class="card-info">
+        <p class="card-title">003: NOISE RINGS</p>
+        <div class="fps-counter" id="fps-canvas-noiserings">-- FPS</div>
+        <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View on Shadertoy →</a>
+      </div>
+    </div>
 
-<div class="card">
-  <canvas id="canvas-starfield"></canvas>
-  <div class="card-info">
-     <p class="card-title">004: STAR FIELD</p>
-     <a href="https://www.shadertoy.com/view/43lyzH" target="_blank" class="card-link">View on Shadertoy →</a>
-  </div>
-</div>
-    
+    <div class="card">
+      <canvas id="canvas-starfield"></canvas>
+      <div class="card-info">
+         <p class="card-title">004: STAR FIELD</p>
+         <div class="fps-counter" id="fps-canvas-starfield">-- FPS</div>
+         <a href="https://www.shadertoy.com/view/43lyzH" target="_blank" class="card-link">View on Shadertoy →</a>
+      </div>
+    </div>
   </main>
 
   <script type="module">
-    // --- THE MASTER ENGINE ---
-    
     async function initShader(canvasId, fragFileName) {
       const canvas = document.getElementById(canvasId);
+      const fpsDisplay = document.getElementById(`fps-${canvasId}`);
       const gl = canvas.getContext('webgl');
       if (!gl) return;
 
-      // 1. Fetch the shader code from your new directory
       const response = await fetch(`shaders/${fragFileName}`);
       const fragmentSource = await response.text();
 
       const vertexSource = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
 
-      // 2. Compile Shaders
       function createShader(gl, type, source) {
         const s = gl.createShader(type);
         gl.shaderSource(s, source);
@@ -118,7 +124,6 @@
       gl.linkProgram(program);
       gl.useProgram(program);
 
-      // 3. Setup Geometry
       const buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
@@ -129,8 +134,26 @@
       const timeLoc = gl.getUniformLocation(program, "u_time");
       const resLoc = gl.getUniformLocation(program, "u_resolution");
 
+      // --- FPS Tracking Variables ---
+      let lastTime = 0;
+      let frameCount = 0;
+      let lastFpsUpdate = 0;
+
       function render(time) {
-        // Sync canvas resolution to CSS size
+        // FPS Calculation
+        const deltaTime = time - lastTime;
+        lastTime = time;
+        frameCount++;
+
+        // Update FPS readout every 500ms so it's readable
+        if (time - lastFpsUpdate > 500) {
+          const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
+          fpsDisplay.innerText = `${fps} FPS`;
+          fpsDisplay.style.color = fps < 30 ? "#ff4444" : "#00ff00";
+          lastFpsUpdate = time;
+          frameCount = 0;
+        }
+
         if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
           canvas.width = canvas.clientWidth;
           canvas.height = canvas.clientHeight;
@@ -144,13 +167,10 @@
       requestAnimationFrame(render);
     }
 
-    // --- ACTIVATION AREA ---
-    // Just add a new line here for every shader you want to load!
     initShader('canvas-triangles', 'triangles.frag');
     initShader('canvas-tunnel', 'tunnel.frag'); 
     initShader('canvas-noiserings', 'noiseRings.frag');
     initShader('canvas-starfield', 'starfield.frag');
-
   </script>
 </body>
 </html>
