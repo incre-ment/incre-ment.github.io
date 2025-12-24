@@ -26,7 +26,14 @@
             text-transform: uppercase;
             margin-bottom: 5px;
         }
-
+       
+        /* Add this to your existing CSS */
+       .card iframe {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: none;
+            display: block;
+        }
         .subtitle {
             color: #666;
             font-size: 0.9rem;
@@ -98,13 +105,14 @@
 
     <main class="gallery">
 
-        <div class="card">
-            <img src="animation1.gif" alt="Description of Processing sketch">
-            <div class="card-info">
-                <p class="card-title">Geometric Flow #01</p>
-                <span class="card-tag">Processing / Java</span>
-            </div>
-        </div>
+    <div class="card">
+      <iframe src="https://www.shadertoy.com/embed/M3XBz4?gui=false&t=10&paused=false&muted=true" allowfullscreen></iframe>
+        <div class="card-info">
+          <p class="card-title">Simplex Noise Rings</p>
+          <span class="card-tag">Shadertoy</span>
+          <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" style="font-size: 0.7rem; color: #4a9eff; text-decoration: none; margin-top: 5px; display: inline-block;">View Source ↗</a>
+       </div>
+    </div>
 
         <div class="card">
             <img src="shader_loop.gif" alt="Shadertoy capture">
