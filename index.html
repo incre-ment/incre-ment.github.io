@@ -3,144 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>incre_ment | terminal_v1.0</title>
+  <title>incre_ment | gallery</title>
   <style>
-    :root {
-      --bg-color: #0a0a0a;
-      --card-bg: #111;
-      --border-color: #222;
-      --text-main: #f0f0f0;
-      --text-dim: #888;
-      --text-accent: #ccc;
-    }
-
-    body { 
-      background-color: var(--bg-color); 
-      color: var(--text-main); 
-      font-family: sans-serif; 
-      margin: 0; 
-      padding: 40px 20px; 
-      /* Subtle scanline effect across the whole page */
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), var(--bg-color);
-      background-size: 100% 4px;
-    }
-
-    /* Header & Terminal Metadata */
-    header { text-align: center; margin-bottom: 80px; position: relative; }
+    body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
     
-    h1 { 
-      font-weight: 200; 
-      letter-spacing: 12px; 
-      text-transform: uppercase; 
-      margin-bottom: 12px; 
-      color: var(--text-main);
-    }
+    /* Header & Metadata Styling */
+    header { text-align: center; margin-bottom: 80px; }
+    h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 10px; }
     
     .header-metadata {
       font-family: monospace;
       font-size: 0.7rem;
-      color: var(--text-dim);
+      color: #888;
       letter-spacing: 2px;
       word-spacing: 5px;
       text-transform: uppercase;
     }
 
     .status-active {
-      color: var(--text-accent);
+      color: #ccc;
       font-weight: bold;
       animation: pulse 3s infinite ease-in-out;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      50% { opacity: 0.4; }
     }
     
-    /* Gallery Grid with Corner Brackets */
+    /* Gallery Grid */
     .gallery { 
       display: grid; 
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
-      gap: 40px; 
+      gap: 30px; 
       max-width: 1400px; 
       margin: 0 auto; 
-      padding: 20px;
-      border-left: 1px solid var(--border-color);
-      border-right: 1px solid var(--border-color);
-      position: relative;
     }
 
-    /* Decorative Corner Brackets */
-    .gallery::before, .gallery::after {
-      content: "[ ]";
-      position: absolute;
-      font-family: monospace;
-      color: #333;
-      font-size: 1.2rem;
-    }
-    .gallery::before { top: -10px; left: -5px; }
-    .gallery::after { bottom: -10px; right: -5px; }
-
-    /* Card Styling */
-    .card { 
-      background: var(--card-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 2px; 
-      overflow: hidden; 
-      display: flex; 
-      flex-direction: column; 
-      position: relative;
-    }
-
-    /* Top 'Bit-Stream' bar */
-    .card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 1px;
-      background: #444;
-      z-index: 10;
-    }
+    .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
     
     canvas { 
       width: 100%; 
       aspect-ratio: 16 / 9; 
       display: block; 
-      background-color: #000;
-      filter: brightness(0.9) contrast(1.1); /* Gritty aesthetic */
+      background-color: #000; 
     }
     
-    .card-info { padding: 18px; border-top: 1px solid var(--border-color); position: relative; }
-    
-    .card-title { 
-      font-family: monospace;
-      font-size: 0.75rem; 
-      margin: 0; 
-      color: #aaa; 
-      letter-spacing: 1px; 
-    }
+    .card-info { padding: 15px; border-top: 1px solid #222; position: relative; }
+    .card-title { font-size: 0.9rem; margin: 0; color: #ddd; letter-spacing: 1px; }
 
     .card-link {
       display: inline-block;
-      margin-top: 10px;
-      font-size: 0.65rem;
-      color: #555;
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: #666;
       text-decoration: none;
       letter-spacing: 1px;
       text-transform: uppercase;
       transition: color 0.3s ease;
     }
 
-    .card-link:hover { color: var(--text-main); }
+    .card-link:hover { color: #fff; }
 
-    /* Performance Metrics Overlay */
+    /* Performance Metrics */
     .fps-counter {
       position: absolute;
-      top: 18px;
-      right: 18px;
+      top: 15px;
+      right: 15px;
       font-family: monospace;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: #666;
       opacity: 0.8;
       letter-spacing: 0.5px;
+      text-align: right;
     }
   </style>
 </head>
@@ -149,9 +84,9 @@
   <header>
     <h1>incre_ment</h1>
     <div class="header-metadata">
-      SYS_ID: <span class="status-active">INC_RE_001</span> // 
+      STATUS: <span class="status-active">ACTIVE</span> // 
       GPU_LOAD: STABLE // 
-      NODES: <span id="node-count">00</span> // 
+      NODES: 04 // 
       <span id="current-date">0000.00.00</span>
     </div>
   </header>
@@ -160,52 +95,48 @@
     <div class="card">
       <canvas id="canvas-triangles"></canvas>
       <div class="card-info">
-        <p class="card-title">MEM_ADDR: 0x001 // TRI_LOADER</p>
+        <p class="card-title">001: LOADING LOADING LOADING</p>
         <div class="fps-counter" id="fps-canvas-triangles">-- FPS · --ms</div>
-        <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">SRC_FILE →</a>
+        <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
 
     <div class="card">
       <canvas id="canvas-tunnel"></canvas>
       <div class="card-info">
-        <p class="card-title">MEM_ADDR: 0x002 // CONDUIT_MKII</p>
+        <p class="card-title">002: DARKNESS CONDUIT MARK II</p>
         <div class="fps-counter" id="fps-canvas-tunnel">-- FPS · --ms</div>
-        <a href="https://www.shadertoy.com/view/Wc3yRr" target="_blank" class="card-link">SRC_FILE →</a>
+        <a href="https://www.shadertoy.com/view/Wc3yRr" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
 
     <div class="card">
       <canvas id="canvas-noiserings"></canvas>
       <div class="card-info">
-        <p class="card-title">MEM_ADDR: 0x003 // NOISE_GEN_V3</p>
+        <p class="card-title">003: SIMPLEX NOISE RINGS</p>
         <div class="fps-counter" id="fps-canvas-noiserings">-- FPS · --ms</div>
-        <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">SRC_FILE →</a>
+        <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
 
     <div class="card">
       <canvas id="canvas-starfield"></canvas>
       <div class="card-info">
-         <p class="card-title">MEM_ADDR: 0x004 // RIPPLE_PROC</p>
+         <p class="card-title">004: A RIPPLE ACROSS</p>
          <div class="fps-counter" id="fps-canvas-starfield">-- FPS · --ms</div>
-         <a href="https://www.shadertoy.com/view/43lyzH" target="_blank" class="card-link">SRC_FILE →</a>
+         <a href="https://www.shadertoy.com/view/43lyzH" target="_blank" class="card-link">View on Shadertoy →</a>
       </div>
     </div>
   </main>
 
   <script type="module">
-    // --- System Metadata Initialization ---
+    // --- Auto-Date Script ---
     const dateDisplay = document.getElementById('current-date');
-    const nodeDisplay = document.getElementById('node-count');
-    
-    // Auto-Date
     const now = new Date();
-    dateDisplay.innerText = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
-
-    // Auto-Node Count
-    const totalNodes = document.querySelectorAll('.card').length;
-    nodeDisplay.innerText = String(totalNodes).padStart(2, '0');
+    const formattedDate = now.getFullYear() + '.' + 
+                          String(now.getMonth() + 1).padStart(2, '0') + '.' + 
+                          String(now.getDate()).padStart(2, '0');
+    dateDisplay.innerText = formattedDate;
 
     // --- Master Shader Engine ---
     async function initShader(canvasId, fragFileName) {
@@ -273,7 +204,7 @@
       requestAnimationFrame(render);
     }
 
-    // --- Boot Sequence ---
+    // --- Activation ---
     initShader('canvas-triangles', 'triangles.frag');
     initShader('canvas-tunnel', 'tunnel.frag'); 
     initShader('canvas-noiserings', 'noiseRings.frag');
