@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>incre_ment</title>
+  
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/glslCanvas/0.2.6/GlslCanvas.js"></script>
+
   <style>
     /* Base Styles */
     body {
@@ -58,8 +61,10 @@
       border-color: #444;
     }
 
+    /* Target all media types: Canvas, Image, and Iframe */
     .card iframe,
-    .card img {
+    .card img,
+    .glslCanvas {
       width: 100%;
       aspect-ratio: 1 / 1;
       border: none;
@@ -87,18 +92,6 @@
       display: block;
     }
 
-    .card-link {
-      font-size: 0.7rem;
-      color: #4a9eff;
-      text-decoration: none;
-      margin-top: 10px;
-      display: inline-block;
-    }
-
-    .card-link:hover {
-      text-decoration: underline;
-    }
-
     footer {
       text-align: center;
       margin-top: 80px;
@@ -114,21 +107,60 @@
     <p class="subtitle">Generative Art & Fragment Shaders</p>
   </header>
 
+  <script id="tri-shader" type="x-shader/x-fragment">
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform vec2 u_resolution;
+    uniform float u_time;
+
+    #define rotation(angle) mat2(cos(angle), -sin(angle), sin(angle), cos(angle))
+
+    float TAU = 2.*3.14159;
+
+    // Equilateral Triangle Signed Distance Function
+    float eqTri( in vec2 p, in float r ) {
+        const float k = sqrt(3.0);
+        p.x = abs(p.x) - r;
+        p.y = p.y + r/k;
+        if( p.x+k*p.y>0.0 ) p = vec2(p.x-k*p.y,-k*p.x-p.y)/2.0;
+        p.x -= clamp( p.x, -2.0*r, 0.0 );
+        return -length(p)*sign(p.y);
+    }
+
+    void main() {
+        // Translation: gl_FragCoord and u_resolution
+        vec2 uv = ( gl_FragCoord.xy - .5 * u_resolution.xy ) / u_resolution.y;
+        vec3 col = vec3(0.);
+        
+        // Translation: u_time replaces iTime
+        float t = fract(.1 * u_time);
+        
+        uv *= rotation(3. * TAU * (.3 - clamp(length(uv),0.,.3)));
+        float s = -1.;
+        
+        for(float i = 0.; i < 3.; i++){
+          float rad = .4 / pow(2.,i) * (.9 - .2 * i);
+          uv *= rotation(-2. * s * (i + 1.) * TAU * t);
+          float tri = eqTri(uv, rad);
+          s *= -1.;
+          col += .004 / abs(tri);
+        }
+        
+        gl_FragColor = vec4(col, 1.0);
+    }
+  </script>
+
   <main class="gallery">
 
-<div class="card">
-  <iframe 
-    src="https://www.shadertoy.com/embed/M3XBz4?gui=false&t=10&paused=false&muted=true" 
-    allowfullscreen 
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
-  <div class="card-info">
-    <p class="card-title">Simplex Noise Rings</p>
-    <span class="card-tag">Shadertoy</span>
-    <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View Source ↗</a>
-  </div>
-</div>
+    <div class="card">
+      <canvas class="glslCanvas" data-fragment-url="#tri-shader"></canvas>
+      <div class="card-info">
+        <p class="card-title">Rotating Triangles</p>
+        <span class="card-tag">Native GLSL</span>
+      </div>
+    </div>
 
     <div class="card">
       <img src="shader_loop.gif" alt="Neon Pulse animation" loading="lazy">
@@ -141,7 +173,7 @@
   </main>
 
   <footer>
-    <p>&copy; 2026 incre_ment</p>
+    <p>&copy; 2025 incre_ment</p>
   </footer>
 
 </body>
