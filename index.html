@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>incre_ment | gallery</title>
+  <title>incre_ment | procedural gallery</title>
+  
+  <meta name="description" content="incre_ment | A high-performance gallery of GLSL shaders and real-time procedural art. Low bandwidth, GPU-accelerated generative nodes.">
+  <meta name="keywords" content="incre_ment, shader gallery, WebGL, generative art, GLSL, fragment shaders, creative coding">
+  
   <style>
     body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
     
@@ -66,7 +70,7 @@
       transition: opacity 0.2s ease;
     }
 
-    /* Option 1: Corner Brackets Styling */
+    /* Option 1: Corner Brackets */
     .card { 
       background: #151515; 
       border: 1px solid #222; 
@@ -74,10 +78,9 @@
       overflow: hidden; 
       display: flex; 
       flex-direction: column; 
-      position: relative; /* Needed for absolute positioning of brackets */
+      position: relative;
     }
 
-    /* Top-Left Bracket */
     .card::before {
       content: "";
       position: absolute;
@@ -91,7 +94,6 @@
       pointer-events: none;
     }
 
-    /* Bottom-Right Bracket */
     .card-info::after {
       content: "";
       position: absolute;
@@ -166,6 +168,31 @@
       background: #f0f0f0;
       border: 1px solid #f0f0f0;
     }
+
+    /* SEO System Manifest Styling */
+    .system-manifest {
+      max-width: 800px;
+      margin: 60px auto 0;
+      padding: 20px;
+      font-family: monospace;
+    }
+
+    .manifest-content h3 {
+      font-size: 0.7rem;
+      color: #222; /* Very muted */
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .manifest-content p {
+      font-size: 0.6rem;
+      line-height: 1.6;
+      color: #1a1a1a; /* Stealth text - visible mainly to crawlers */
+      text-align: justify;
+      letter-spacing: 0.5px;
+    }
+
+    .manifest-content strong { color: #2a2a2a; font-weight: normal; }
   </style>
 </head>
 <body>
@@ -193,8 +220,20 @@
     </p>
   </footer>
 
+  <section class="system-manifest">
+    <div class="manifest-content">
+      <h3>// SYSTEM_MANIFEST.TXT</h3>
+      <p>
+        <strong>incre_ment</strong> is a high-performance, low-bandwidth <strong>procedural gallery</strong> 
+        dedicated to the exploration of <strong>GLSL fragment shaders</strong> and <strong>real-time generative art</strong>. 
+        Each node in this <strong>WebGL gallery</strong> is rendered live on the GPU using custom <strong>fragment shaders</strong>, 
+        showcasing the intersection of mathematics and digital aesthetics. 
+        This collection of <strong>creative coding</strong> experiments is open-source and hosted via <strong>GitHub Pages</strong>.
+      </p>
+    </div>
+  </section>
+
   <script type="module">
-    // --- Configuration: Memory Banks ---
     const memoryBanks = {
       "BANK_01": [
         { id: "triangles", title: "001: LOADING LOADING LOADING", file: "triangles.frag", link: "lc3cRN" },
@@ -212,10 +251,8 @@
 
     let activeAnimationFrames = [];
 
-    // --- Bank Switching Logic ---
     async function switchBank(bankKey) {
       const grid = document.getElementById('mainframe-grid');
-      
       document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('onclick').includes(bankKey)) {
@@ -251,7 +288,6 @@
       }, 200);
     }
 
-    // --- Master Shader Engine ---
     async function initShader(canvasId, fragFileName) {
       const canvas = document.getElementById(canvasId);
       const fpsDisplay = document.getElementById(`fps-${canvasId}`);
@@ -267,9 +303,6 @@
           const s = gl.createShader(type);
           gl.shaderSource(s, source);
           gl.compileShader(s);
-          if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-            console.error(`Shader Error in ${fragFileName}:`, gl.getShaderInfoLog(s));
-          }
           return s;
         }
 
@@ -295,14 +328,13 @@
 
         function render(time) {
           if (!document.getElementById(canvasId)) return;
-
           const deltaTime = time - lastTime;
           lastTime = time;
           frameCount++;
 
           if (time - lastFpsUpdate > 500) {
             const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-            // Option 3: Update readout to use brackets
+            // Option 3: Update readout with brackets
             if (fpsDisplay) fpsDisplay.innerText = `[ ${fps} FPS ] [ ${deltaTime.toFixed(1)}MS ]`;
             lastFpsUpdate = time;
             frameCount = 0;
@@ -317,26 +349,20 @@
           gl.uniform1f(timeLoc, time * 0.001);
           gl.uniform2f(resLoc, canvas.width, canvas.height);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
-          
           activeAnimationFrames.push(requestAnimationFrame(render));
         }
         activeAnimationFrames.push(requestAnimationFrame(render));
-      } catch (err) {
-        console.error("Fetch error:", err);
-      }
+      } catch (err) { console.error(err); }
     }
 
-    // --- Contact Protocol (Obfuscation) ---
     function runContactProtocol() {
       const u = "kgrx";
       const d = "protonmail.com";
       window.location.href = `mailto:${u}@${d}`;
     }
 
-    // --- Initialization ---
     window.switchBank = switchBank;
     window.runContactProtocol = runContactProtocol; 
-    
     switchBank('BANK_01');
 
     const dateDisplay = document.getElementById('current-date');
