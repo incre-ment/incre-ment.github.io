@@ -8,7 +8,7 @@
     body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
     
     /* Header & Metadata Styling */
-    header { text-align: center; margin-bottom: 80px; }
+    header { text-align: center; margin-bottom: 40px; }
     h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 10px; }
     
     .header-metadata {
@@ -18,6 +18,31 @@
       letter-spacing: 2px;
       word-spacing: 5px;
       text-transform: uppercase;
+    }
+
+    /* Terminal Navigation */
+    nav {
+      text-align: center;
+      margin-bottom: 60px;
+      font-family: monospace;
+    }
+
+    .nav-link {
+      color: #444;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+      padding: 5px 10px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+      border: 1px solid #333;
+      background: #111;
     }
 
     .status-active {
@@ -37,7 +62,8 @@
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
       gap: 30px; 
       max-width: 1400px; 
-      margin: 0 auto; 
+      margin: 0 auto;
+      transition: opacity 0.2s ease;
     }
 
     .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
@@ -65,7 +91,6 @@
 
     .card-link:hover { color: #fff; }
 
-    /* Performance Metrics */
     .fps-counter {
       position: absolute;
       top: 15px;
@@ -86,76 +111,75 @@
     <div class="header-metadata">
       STATUS: <span class="status-active">ACTIVE</span> // 
       GPU_LOAD: STABLE // 
-      NODES: 06 // 
+      NODES: 04 // 
       <span id="current-date">0000.00.00</span>
     </div>
   </header>
 
-  <main class="gallery">
-    <div class="card">
-      <canvas id="canvas-triangles"></canvas>
-      <div class="card-info">
-        <p class="card-title">001: LOADING LOADING LOADING</p>
-        <div class="fps-counter" id="fps-canvas-triangles">-- FPS · --ms</div>
-        <a href="https://www.shadertoy.com/view/lc3cRN" target="_blank" class="card-link">View on Shadertoy →</a>
-      </div>
-    </div>
+  <nav id="bank-nav">
+    <span class="nav-link active" onclick="switchBank('BANK_01')">[ BANK_01 ]</span>
+    <span class="nav-link" onclick="switchBank('BANK_02')">[ BANK_02 ]</span>
+  </nav>
 
-    <div class="card">
-      <canvas id="canvas-tunnel"></canvas>
-      <div class="card-info">
-        <p class="card-title">002: DARKNESS CONDUIT MARK II</p>
-        <div class="fps-counter" id="fps-canvas-tunnel">-- FPS · --ms</div>
-        <a href="https://www.shadertoy.com/view/Wc3yRr" target="_blank" class="card-link">View on Shadertoy →</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <canvas id="canvas-noiserings"></canvas>
-      <div class="card-info">
-        <p class="card-title">003: SIMPLEX NOISE RINGS</p>
-        <div class="fps-counter" id="fps-canvas-noiserings">-- FPS · --ms</div>
-        <a href="https://www.shadertoy.com/view/M3XBz4" target="_blank" class="card-link">View on Shadertoy →</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <canvas id="canvas-starfield"></canvas>
-      <div class="card-info">
-         <p class="card-title">004: A RIPPLE ACROSS</p>
-         <div class="fps-counter" id="fps-canvas-starfield">-- FPS · --ms</div>
-         <a href="https://www.shadertoy.com/view/43lyzH" target="_blank" class="card-link">View on Shadertoy →</a>
-      </div>
-    </div>
-    
-  <div class="card">
-  <canvas id="canvas-city"></canvas>
-  <div class="card-info">
-    <p class="card-title">005: PARALLAX CITYSCAPE</p>
-    <div class="fps-counter" id="fps-canvas-city">-- FPS · --ms</div>
-    <a href="https://www.shadertoy.com/view/l32yDc" target="_blank" class="card-link">View on Shadertoy →</a>
-  </div>
-</div>
-
-  <div class="card">
-  <canvas id="canvas-geo"></canvas>
-  <div class="card-info">
-    <p class="card-title">006: PATH DRAW</p>
-    <div class="fps-counter" id="fps-canvas-geo">-- FPS · --ms</div>
-    <a href="https://www.shadertoy.com/view/XcdGzS" target="_blank" class="card-link">View on Shadertoy →</a>
-  </div>
-</div>    
-    
-  </main>
+  <main class="gallery" id="mainframe-grid">
+    </main>
 
   <script type="module">
-    // --- Auto-Date Script ---
-    const dateDisplay = document.getElementById('current-date');
-    const now = new Date();
-    const formattedDate = now.getFullYear() + '.' + 
-                          String(now.getMonth() + 1).padStart(2, '0') + '.' + 
-                          String(now.getDate()).padStart(2, '0');
-    dateDisplay.innerText = formattedDate;
+    // --- Configuration: Memory Banks ---
+    const memoryBanks = {
+      "BANK_01": [
+        { id: "triangles", title: "001: LOADING LOADING LOADING", file: "triangles.frag", link: "lc3cRN" },
+        { id: "tunnel", title: "002: DARKNESS CONDUIT MARK II", file: "tunnel.frag", link: "Wc3yRr" },
+        { id: "noiserings", title: "003: SIMPLEX NOISE RINGS", file: "noiseRings.frag", link: "M3XBz4" },
+        { id: "starfield", title: "004: A RIPPLE ACROSS", file: "starfield.frag", link: "43lyzH" }
+      ],
+      "BANK_02": [
+        { id: "city", title: "005: PARALLAX CITYSCAPE", file: "city.frag", link: "l32yDc" },
+        { id: "geo", title: "006: PATH DRAW", file: "geo.frag", link: "XcdGzS" }
+        // Tip: Add two more here to keep the 4x grid consistent
+      ]
+    };
+
+    let activeAnimationFrames = [];
+
+    // --- Bank Switching Logic ---
+    async function switchBank(bankKey) {
+      const grid = document.getElementById('mainframe-grid');
+      
+      // Update UI state
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.toggle('active', link.innerText.includes(bankKey));
+      });
+
+      // 1. Visual "Flicker" effect
+      grid.style.opacity = '0';
+
+      // 2. Cleanup: Stop all current shader loops
+      activeAnimationFrames.forEach(id => cancelAnimationFrame(id));
+      activeAnimationFrames = [];
+
+      // 3. Re-index Cluster
+      setTimeout(async () => {
+        grid.innerHTML = '';
+        
+        const shaders = memoryBanks[bankKey];
+        for (const data of shaders) {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <canvas id="canvas-${data.id}"></canvas>
+            <div class="card-info">
+              <p class="card-title">${data.title}</p>
+              <div class="fps-counter" id="fps-canvas-${data.id}">-- FPS · --ms</div>
+              <a href="https://www.shadertoy.com/view/${data.link}" target="_blank" class="card-link">View on Shadertoy →</a>
+            </div>
+          `;
+          grid.appendChild(card);
+          initShader(`canvas-${data.id}`, data.file);
+        }
+        grid.style.opacity = '1';
+      }, 200);
+    }
 
     // --- Master Shader Engine ---
     async function initShader(canvasId, fragFileName) {
@@ -203,9 +227,7 @@
 
         if (time - lastFpsUpdate > 500) {
           const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-          const avgTime = deltaTime.toFixed(1);
-          fpsDisplay.innerText = `${fps} FPS · ${avgTime}ms`;
-          fpsDisplay.style.opacity = fps < 45 ? "0.4" : "0.8";
+          fpsDisplay.innerText = `${fps} FPS · ${deltaTime.toFixed(1)}ms`;
           lastFpsUpdate = time;
           frameCount = 0;
         }
@@ -218,18 +240,19 @@
         gl.uniform1f(timeLoc, time * 0.001);
         gl.uniform2f(resLoc, canvas.width, canvas.height);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        requestAnimationFrame(render);
+        
+        const frameId = requestAnimationFrame(render);
+        activeAnimationFrames.push(frameId);
       }
       requestAnimationFrame(render);
     }
 
-    // --- Activation ---
-    initShader('canvas-triangles', 'triangles.frag');
-    initShader('canvas-tunnel', 'tunnel.frag'); 
-    initShader('canvas-noiserings', 'noiseRings.frag');
-    initShader('canvas-starfield', 'starfield.frag');
-    initShader('canvas-city', 'city.frag');
-    initShader('canvas-geo', 'geo.frag');
+    // --- Initialization ---
+    window.switchBank = switchBank; // Expose to global scope for onclick
+    switchBank('BANK_01');
+
+    const dateDisplay = document.getElementById('current-date');
+    dateDisplay.innerText = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
   </script>
 </body>
 </html>
