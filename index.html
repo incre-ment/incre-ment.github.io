@@ -66,7 +66,43 @@
       transition: opacity 0.2s ease;
     }
 
-    .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
+    /* Option 1: Corner Brackets Styling */
+    .card { 
+      background: #151515; 
+      border: 1px solid #222; 
+      border-radius: 4px; 
+      overflow: hidden; 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; /* Needed for absolute positioning of brackets */
+    }
+
+    /* Top-Left Bracket */
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid #444;
+      border-left: 2px solid #444;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Bottom-Right Bracket */
+    .card-info::after {
+      content: "";
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      width: 12px;
+      height: 12px;
+      border-bottom: 2px solid #444;
+      border-right: 2px solid #444;
+      pointer-events: none;
+    }
     
     canvas { 
       width: 100%; 
@@ -199,11 +235,12 @@
         for (const data of shaders) {
           const card = document.createElement('div');
           card.className = 'card';
+          // Option 3: Initializing with bracketed placeholders
           card.innerHTML = `
             <canvas id="canvas-${data.id}"></canvas>
             <div class="card-info">
               <p class="card-title">${data.title}</p>
-              <div class="fps-counter" id="fps-canvas-${data.id}">-- FPS · --ms</div>
+              <div class="fps-counter" id="fps-canvas-${data.id}">[ -- FPS ] [ --MS ]</div>
               <a href="https://www.shadertoy.com/view/${data.link}" target="_blank" class="card-link">View on Shadertoy →</a>
             </div>
           `;
@@ -265,7 +302,8 @@
 
           if (time - lastFpsUpdate > 500) {
             const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-            if (fpsDisplay) fpsDisplay.innerText = `${fps} FPS · ${deltaTime.toFixed(1)}ms`;
+            // Option 3: Update readout to use brackets
+            if (fpsDisplay) fpsDisplay.innerText = `[ ${fps} FPS ] [ ${deltaTime.toFixed(1)}MS ]`;
             lastFpsUpdate = time;
             frameCount = 0;
           }
@@ -290,14 +328,14 @@
 
     // --- Contact Protocol (Obfuscation) ---
     function runContactProtocol() {
-      const u = "kgrx";   // Replace with your email prefix
-      const d = "protonmail.com"; // Replace with your domain
+      const u = "kgrx";
+      const d = "protonmail.com";
       window.location.href = `mailto:${u}@${d}`;
     }
 
     // --- Initialization ---
     window.switchBank = switchBank;
-    window.runContactProtocol = runContactProtocol; // Expose to onclick
+    window.runContactProtocol = runContactProtocol; 
     
     switchBank('BANK_01');
 
