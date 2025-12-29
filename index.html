@@ -10,8 +10,6 @@
   
   <style>
     body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
-    
-    /* Header & Metadata Styling */
     header { text-align: center; margin-bottom: 40px; }
     h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 10px; }
     
@@ -24,12 +22,7 @@
       text-transform: uppercase;
     }
 
-    /* Terminal Navigation */
-    nav {
-      text-align: center;
-      margin-bottom: 60px;
-      font-family: monospace;
-    }
+    nav { text-align: center; margin-bottom: 60px; font-family: monospace; }
 
     .nav-link {
       color: #444;
@@ -60,7 +53,6 @@
       50% { opacity: 0.4; }
     }
     
-    /* Gallery Grid */
     .gallery { 
       display: grid; 
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
@@ -70,7 +62,6 @@
       transition: opacity 0.2s ease;
     }
 
-    /* Option 1: Corner Brackets */
     .card { 
       background: #151515; 
       border: 1px solid #222; 
@@ -141,7 +132,6 @@
       text-align: right;
     }
 
-    /* Monochrome Footer */
     footer {
       margin-top: 80px;
       text-align: center;
@@ -163,35 +153,17 @@
       cursor: pointer;
     }
 
-    .cmd-link:hover {
-      color: #000;
-      background: #f0f0f0;
-      border: 1px solid #f0f0f0;
-    }
+    .cmd-link:hover { color: #000; background: #f0f0f0; border: 1px solid #f0f0f0; }
 
-    /* SEO System Manifest Styling */
-    .system-manifest {
-      max-width: 800px;
-      margin: 60px auto 0;
-      padding: 20px;
-      font-family: monospace;
-    }
-
-    .manifest-content h3 {
-      font-size: 0.7rem;
-      color: #222; /* Very muted */
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
+    .system-manifest { max-width: 800px; margin: 60px auto 0; padding: 20px; font-family: monospace; }
+    .manifest-content h3 { font-size: 0.7rem; color: #222; margin-bottom: 10px; text-align: center; }
     .manifest-content p {
       font-size: 0.6rem;
       line-height: 1.6;
-      color: #1a1a1a; /* Stealth text - visible mainly to crawlers */
+      color: #1a1a1a;
       text-align: justify;
       letter-spacing: 0.5px;
     }
-
     .manifest-content strong { color: #2a2a2a; font-weight: normal; }
   </style>
 </head>
@@ -202,7 +174,7 @@
     <div class="header-metadata">
       STATUS: <span class="status-active">ACTIVE</span> // 
       GPU_LOAD: STABLE // 
-      NODES: 08 // 
+      NODES: 12 // 
       <span id="current-date">0000.00.00</span>
     </div>
   </header>
@@ -225,7 +197,7 @@
     <div class="manifest-content">
       <h3>// SYSTEM_MANIFEST.TXT</h3>
       <p>
-        This is a high-performance, low-bandwidth <strong>procedural gallery by incre_ment</strong> 
+        This is a high-performance, low-bandwidth <strong>procedural gallery by incre_ment</strong>. 
         It is dedicated to the exploration of <strong>GLSL fragment shaders</strong> and <strong>real-time generative art</strong>. 
         Each node in this <strong>WebGL gallery</strong> is rendered live on the GPU using custom <strong>fragment shaders</strong>, 
         showcasing the intersection of mathematics and digital aesthetics. 
@@ -254,7 +226,6 @@
         { id: "rain", title: "011: PRIMITIVE RAIN", file: "rain.frag", link: "lXXXWr" },
         { id: "wavycube", title: "012: WAVY CUBE", file: "wavy_cube.frag", link: "WfXGRX" }
        ]
-      
     };
 
     let activeAnimationFrames = [];
@@ -280,7 +251,6 @@
         for (const data of shaders) {
           const card = document.createElement('div');
           card.className = 'card';
-          // Option 3: Initializing with bracketed placeholders
           card.innerHTML = `
             <canvas id="canvas-${data.id}"></canvas>
             <div class="card-info">
@@ -298,9 +268,11 @@
 
     async function initShader(canvasId, fragFileName) {
       const canvas = document.getElementById(canvasId);
-      const fpsDisplay = document.getElementById(`fps-${canvasId}`);
       const gl = canvas.getContext('webgl');
       if (!gl) return;
+
+      // Enable standard derivatives for fwidth() support
+      gl.getExtension('OES_standard_derivatives');
 
       try {
         const response = await fetch(`shaders/${fragFileName}`);
@@ -342,7 +314,7 @@
 
           if (time - lastFpsUpdate > 500) {
             const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-            // Option 3: Update readout with brackets
+            const fpsDisplay = document.getElementById(`fps-${canvasId}`);
             if (fpsDisplay) fpsDisplay.innerText = `[ ${fps} FPS ] [ ${deltaTime.toFixed(1)}MS ]`;
             lastFpsUpdate = time;
             frameCount = 0;
@@ -357,7 +329,10 @@
           gl.uniform1f(timeLoc, time * 0.001);
           gl.uniform2f(resLoc, canvas.width, canvas.height);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
-          activeAnimationFrames.push(requestAnimationFrame(render));
+          
+          const frameId = requestAnimationFrame(render);
+          activeAnimationFrames.push(frameId);
+          if (activeAnimationFrames.length > 50) activeAnimationFrames.shift();
         }
         activeAnimationFrames.push(requestAnimationFrame(render));
       } catch (err) { console.error(err); }
