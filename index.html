@@ -46,7 +46,7 @@
     }
 
     .status-active {
-      color: #ccc;
+      color: #f0f0f0;
       font-weight: bold;
       animation: pulse 3s infinite ease-in-out;
     }
@@ -103,31 +103,33 @@
       text-align: right;
     }
 
-footer {
-  margin-top: 80px;
-  text-align: center;
-  font-family: monospace;
-  border-top: 1px solid #222;
-  padding: 40px 20px;
-  opacity: 0.8;
-}
+    /* Monochrome Footer */
+    footer {
+      margin-top: 80px;
+      text-align: center;
+      font-family: monospace;
+      border-top: 1px solid #222;
+      padding: 40px 20px;
+      opacity: 0.8;
+    }
 
-.cmd-link {
-  color: #888; /* Subtle gray to match metadata */
-  text-decoration: none;
-  padding: 5px 12px;
-  margin: 0 5px;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-}
+    .cmd-link {
+      color: #888;
+      text-decoration: none;
+      padding: 5px 12px;
+      margin: 0 5px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
 
-.cmd-link:hover {
-  color: #000;         /* Invert: Black text */
-  background: #f0f0f0; /* Invert: White/Light background */
-  border: 1px solid #f0f0f0;
-}
+    .cmd-link:hover {
+      color: #000;
+      background: #f0f0f0;
+      border: 1px solid #f0f0f0;
+    }
   </style>
 </head>
 <body>
@@ -150,10 +152,10 @@ footer {
   <main class="gallery" id="mainframe-grid"></main>
 
   <footer>
-    <p>
-      $ <span style="color: #888;">CONTACT:</span> 
-      <a href="mailto:kgrx@protonmail.com" class="cmd-link">SEND_MESSAGE</a> // 
-      <a href="https://github.com/incre-ment" class="cmd-link">GITHUB</a>
+    <p style="font-size: 0.7rem; letter-spacing: 1px; color: #444;">
+      $ [ SYSTEM_UPLINK ] // 
+      <a class="cmd-link" onclick="runContactProtocol()">MESSAGE_ADMIN</a> // 
+      <a href="https://github.com/yourusername" class="cmd-link" target="_blank">SOURCE_CODE</a>
     </p>
   </footer>
 
@@ -180,23 +182,17 @@ footer {
     async function switchBank(bankKey) {
       const grid = document.getElementById('mainframe-grid');
       
-      // Update UI state
       document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
-        // Check if the link's onclick matches the bankKey
         if (link.getAttribute('onclick').includes(bankKey)) {
           link.classList.add('active');
         }
       });
 
-      // Visual "Flicker" effect
       grid.style.opacity = '0';
-
-      // Cleanup: Stop all current shader loops
       activeAnimationFrames.forEach(id => cancelAnimationFrame(id));
       activeAnimationFrames = [];
 
-      // Re-build Cluster
       setTimeout(async () => {
         grid.innerHTML = '';
         const shaders = memoryBanks[bankKey];
@@ -263,14 +259,12 @@ footer {
         let lastFpsUpdate = 0;
 
         function render(time) {
-          // Safety: If the canvas is gone from the page, stop the loop
           if (!document.getElementById(canvasId)) return;
 
           const deltaTime = time - lastTime;
           lastTime = time;
           frameCount++;
 
-          // Update FPS readout every 500ms
           if (time - lastFpsUpdate > 500) {
             const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
             if (fpsDisplay) fpsDisplay.innerText = `${fps} FPS · ${deltaTime.toFixed(1)}ms`;
@@ -278,7 +272,6 @@ footer {
             frameCount = 0;
           }
 
-          // Handle resizing
           if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
@@ -289,23 +282,29 @@ footer {
           gl.uniform2f(resLoc, canvas.width, canvas.height);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
           
-          const requestId = requestAnimationFrame(render);
-          activeAnimationFrames.push(requestId);
+          activeAnimationFrames.push(requestAnimationFrame(render));
         }
-        requestAnimationFrame(render);
+        activeAnimationFrames.push(requestAnimationFrame(render));
       } catch (err) {
-        console.error("Could not load shader file:", fragFileName);
+        console.error("Fetch error:", err);
       }
     }
 
+    // --- Contact Protocol (Obfuscation) ---
+    function runContactProtocol() {
+      const u = "yourname";   // Replace with your email prefix
+      const d = "email.com"; // Replace with your domain
+      window.location.href = `mailto:${u}@${d}`;
+    }
+
     // --- Initialization ---
-    window.switchBank = switchBank; // Make accessible to onclick
+    window.switchBank = switchBank;
+    window.runContactProtocol = runContactProtocol; // Expose to onclick
+    
     switchBank('BANK_01');
 
-    // Set auto-date
     const dateDisplay = document.getElementById('current-date');
     dateDisplay.innerText = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
-
   </script>
 </body>
 </html>
