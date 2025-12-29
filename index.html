@@ -66,43 +66,7 @@
       transition: opacity 0.2s ease;
     }
 
-    /* OPTION 1: Corner Brackets Styling */
-    .card { 
-      background: #151515; 
-      border: 1px solid #222; 
-      border-radius: 4px; 
-      overflow: hidden; 
-      display: flex; 
-      flex-direction: column; 
-      position: relative;
-    }
-
-    /* Top-Left Bracket */
-    .card::before {
-      content: "";
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      width: 12px;
-      height: 12px;
-      border-top: 2px solid #444;
-      border-left: 2px solid #444;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    /* Bottom-Right Bracket (inside info area) */
-    .card-info::after {
-      content: "";
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
-      width: 12px;
-      height: 12px;
-      border-bottom: 2px solid #444;
-      border-right: 2px solid #444;
-      pointer-events: none;
-    }
+    .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
     
     canvas { 
       width: 100%; 
@@ -174,8 +138,7 @@
     <h1>incre_ment</h1>
     <div class="header-metadata">
       STATUS: <span class="status-active">ACTIVE</span> // 
-      GPU_LOAD: <span id="gpu-load">STABLE</span> // 
-      LATENCY: <span id="system-latency">16.6</span>ms // 
+      GPU_LOAD: STABLE // 
       NODES: 08 // 
       <span id="current-date">0000.00.00</span>
     </div>
@@ -190,13 +153,12 @@
 
   <footer>
     <p style="font-size: 0.7rem; letter-spacing: 1px; color: #444;">
-      $ [ SYSTEM_UPLINK ] // 
-      <a class="cmd-link" onclick="runContactProtocol()">MESSAGE_ADMIN</a> // 
-      <a href="https://github.com/yourusername" class="cmd-link" target="_blank">SOURCE_CODE</a>
+      <a class="cmd-link" onclick="runContactProtocol()">CONTACT</a> 
     </p>
   </footer>
 
   <script type="module">
+    // --- Configuration: Memory Banks ---
     const memoryBanks = {
       "BANK_01": [
         { id: "triangles", title: "001: LOADING LOADING LOADING", file: "triangles.frag", link: "lc3cRN" },
@@ -214,6 +176,7 @@
 
     let activeAnimationFrames = [];
 
+    // --- Bank Switching Logic ---
     async function switchBank(bankKey) {
       const grid = document.getElementById('mainframe-grid');
       
@@ -236,15 +199,12 @@
         for (const data of shaders) {
           const card = document.createElement('div');
           card.className = 'card';
-          // OPTION 3: Updated InnerHTML with Bracketed Data Placeholders
           card.innerHTML = `
             <canvas id="canvas-${data.id}"></canvas>
             <div class="card-info">
               <p class="card-title">${data.title}</p>
-              <div class="fps-counter" id="fps-canvas-${data.id}">
-                [ -- FPS ] [ --MS ]
-              </div>
-              <a href="https://www.shadertoy.com/view/${data.link}" target="_blank" class="card-link">// UPLINK_SRC //</a>
+              <div class="fps-counter" id="fps-canvas-${data.id}">-- FPS · --ms</div>
+              <a href="https://www.shadertoy.com/view/${data.link}" target="_blank" class="card-link">View on Shadertoy →</a>
             </div>
           `;
           grid.appendChild(card);
@@ -254,6 +214,7 @@
       }, 200);
     }
 
+    // --- Master Shader Engine ---
     async function initShader(canvasId, fragFileName) {
       const canvas = document.getElementById(canvasId);
       const fpsDisplay = document.getElementById(`fps-${canvasId}`);
@@ -269,6 +230,9 @@
           const s = gl.createShader(type);
           gl.shaderSource(s, source);
           gl.compileShader(s);
+          if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            console.error(`Shader Error in ${fragFileName}:`, gl.getShaderInfoLog(s));
+          }
           return s;
         }
 
@@ -294,14 +258,14 @@
 
         function render(time) {
           if (!document.getElementById(canvasId)) return;
+
           const deltaTime = time - lastTime;
           lastTime = time;
           frameCount++;
 
           if (time - lastFpsUpdate > 500) {
             const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-            // OPTION 3: Implementation of bracketed live data
-            if (fpsDisplay) fpsDisplay.innerText = `[ ${fps} FPS ] [ ${deltaTime.toFixed(1)}MS ]`;
+            if (fpsDisplay) fpsDisplay.innerText = `${fps} FPS · ${deltaTime.toFixed(1)}ms`;
             lastFpsUpdate = time;
             frameCount = 0;
           }
@@ -315,34 +279,28 @@
           gl.uniform1f(timeLoc, time * 0.001);
           gl.uniform2f(resLoc, canvas.width, canvas.height);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
+          
           activeAnimationFrames.push(requestAnimationFrame(render));
         }
         activeAnimationFrames.push(requestAnimationFrame(render));
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
     }
 
-    function startSystemHeartbeat() {
-      const latencyEl = document.getElementById('system-latency');
-      const loadEl = document.getElementById('gpu-load');
-      setInterval(() => {
-        const jitter = (Math.random() * 0.6 - 0.3);
-        latencyEl.innerText = (16.6 + jitter).toFixed(1);
-        const rand = Math.random();
-        if (rand > 0.98) { loadEl.innerText = "NOMINAL"; loadEl.style.color = "#fff"; }
-        else if (rand > 0.95) { loadEl.innerText = "HEAVY"; loadEl.style.color = "#888"; }
-        else { loadEl.innerText = "STABLE"; loadEl.style.color = ""; }
-      }, 1500); 
-    }
-
+    // --- Contact Protocol (Obfuscation) ---
     function runContactProtocol() {
-      const u = "yourname"; const d = "email.com";
+      const u = "kgrx";   // Replace with your email prefix
+      const d = "protonmail.com"; // Replace with your domain
       window.location.href = `mailto:${u}@${d}`;
     }
 
+    // --- Initialization ---
     window.switchBank = switchBank;
-    window.runContactProtocol = runContactProtocol;
+    window.runContactProtocol = runContactProtocol; // Expose to onclick
+    
     switchBank('BANK_01');
-    startSystemHeartbeat();
+
     const dateDisplay = document.getElementById('current-date');
     dateDisplay.innerText = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
   </script>
