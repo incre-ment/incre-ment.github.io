@@ -52,7 +52,7 @@ void main() {
     p.yz *= rotation(-TAU / 6.0);
     
     // YOUR OFFSET FIX: Pushing the origin artifact off-screen
-    p.xz += vec2(4.0, 4.0);
+    p.xz += vec2(12.0, 12.0);
     
     // Movement
     p.y -= yDim * tt;
