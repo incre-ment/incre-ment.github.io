@@ -43,28 +43,24 @@ void main() {
   vec3 p = vec3(0.0);
  
   float MAX_DEPTH = 10.0;
-  float NUM_STEPS = 120.0; // Reduced for performance on web
-  float STEP_SIZE = MAX_DEPTH / NUM_STEPS;
+  int NUM_STEPS = 80; // Fewer steps = less accumulation = darker/stabler
+  float STEP_SIZE = MAX_DEPTH / float(NUM_STEPS);
 
-  for(int i = 0; i < 120; i++) {
+  for(int i = 0; i < 80; i++) {
     p = camPos + depth * rayDir;
    
     p.y -= 0.7;
     p.z += 1.5;
-    
     p.yz *= rotation(PI/3.0);
     p.xy *= rotation(tt * PI/2.0);
 
     p *= 3.0;   
     float clampVal = 5.0;
-    
-    // Safety: round replacement for WebGL 1.0
     vec2 cellID = clamp(floor(p.xy + 0.5), -clampVal, clampVal);
     vec3 lp = p;
     lp.xy = p.xy - cellID;
     
     float offFac = fract(142.23 * sin((200.0 + cellID.x) * 1.24 * (100.0 + cellID.y)));
-    
     float tStart = 0.4 * offFac;
     float tEnd = tStart + 0.5;  
     float ttt = (tt < tStart) ? 0.0 : (tt > tEnd) ? 1.0 : (tt - tStart) / 0.5;
@@ -76,24 +72,22 @@ void main() {
     tp.zy *= rotation(PI/2.0);
     d = sdTorus(tp, vec2(0.3, 0.01));    
     
-    // THE SAFETY FLOOR:
-    // Prevents d from reaching 0.0, which makes pow() undefined or Infinite
-    float safeD = max(d, 0.005); 
-    float glow_bit = 0.0004 / pow(safeD, 2.25);
+    // REDUCED INTENSITY: 
+    // We use a much smaller numerator and a larger safety floor
+    float safeD = max(d, 0.04); 
+    float glow_bit = 0.0001 / pow(safeD, 1.8); // 1.8 is a "softer" curve than 2.25
     
     glowTotal += glow_bit;
     depth += STEP_SIZE;
     
-    // Stop if we hit a surface
-    if (d <= 0.001 || depth >= MAX_DEPTH) break;
+    // If we hit the torus, we stop, but we don't force it to white.
+    if (d < 0.001) break;
   }
   
-  // Final Color
-  if (depth >= MAX_DEPTH) {
-      col = vec3(glowTotal);   
-  } else {
-      col = vec3(1.0 + glowTotal); // Add glow to the surface color  
-  }
+  // Use a tone-mapping style approach: 
+  // This ensures the color stays between 0 and 1
+  col = vec3(glowTotal);
+  col = 1.0 - exp(-col * 2.0); // Simple exposure tone-mapping
 
   gl_FragColor = vec4(col, 1.0);
 }
