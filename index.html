@@ -103,27 +103,31 @@
       text-align: right;
     }
 
-    footer {
-      margin-top: 80px;
-      text-align: center;
-      font-family: monospace;
-      border-top: 1px solid #222;
-      padding-top: 20px;
-      opacity: 0.6;
-    }
+footer {
+  margin-top: 80px;
+  text-align: center;
+  font-family: monospace;
+  border-top: 1px solid #222;
+  padding: 40px 20px;
+  opacity: 0.8;
+}
 
-    .cmd-link {
-      color: #00ff00;
-      text-decoration: none;
-      padding: 5px 10px;
-      transition: all 0.3s;
-    }
+.cmd-link {
+  color: #888; /* Subtle gray to match metadata */
+  text-decoration: none;
+  padding: 5px 12px;
+  margin: 0 5px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
 
-    .cmd-link:hover {
-      background: #00ff00;
-      color: #000;
-      box-shadow: 0 0 10px #00ff00;
-    }
+.cmd-link:hover {
+  color: #000;         /* Invert: Black text */
+  background: #f0f0f0; /* Invert: White/Light background */
+  border: 1px solid #f0f0f0;
+}
   </style>
 </head>
 <body>
