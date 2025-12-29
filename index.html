@@ -138,7 +138,8 @@
     <h1>incre_ment</h1>
     <div class="header-metadata">
       STATUS: <span class="status-active">ACTIVE</span> // 
-      GPU_LOAD: STABLE // 
+      GPU_LOAD: <span id="gpu-load">STABLE</span> // 
+      LATENCY: <span id="system-latency">16.6</span>ms // 
       NODES: 08 // 
       <span id="current-date">0000.00.00</span>
     </div>
@@ -153,7 +154,9 @@
 
   <footer>
     <p style="font-size: 0.7rem; letter-spacing: 1px; color: #444;">
-      <a class="cmd-link" onclick="runContactProtocol()">CONTACT</a> 
+      $ [ SYSTEM_UPLINK ] // 
+      <a class="cmd-link" onclick="runContactProtocol()">MESSAGE_ADMIN</a> // 
+      <a href="https://github.com/yourusername" class="cmd-link" target="_blank">SOURCE_CODE</a>
     </p>
   </footer>
 
@@ -288,18 +291,45 @@
       }
     }
 
-    // --- Contact Protocol (Obfuscation) ---
+    // --- System Heartbeat: Mock Latency Jitter ---
+    function startSystemHeartbeat() {
+      const latencyEl = document.getElementById('system-latency');
+      const loadEl = document.getElementById('gpu-load');
+      
+      setInterval(() => {
+        // Generate a tiny jitter between -0.3 and +0.3
+        const jitter = (Math.random() * 0.6 - 0.3);
+        const newLatency = (16.6 + jitter).toFixed(1);
+        latencyEl.innerText = newLatency;
+        
+        // Occasionally flip GPU_LOAD status for flavor
+        const rand = Math.random();
+        if (rand > 0.98) {
+          loadEl.innerText = "NOMINAL";
+          loadEl.style.color = "#fff";
+        } else if (rand > 0.95) {
+          loadEl.innerText = "HEAVY";
+          loadEl.style.color = "#888";
+        } else {
+          loadEl.innerText = "STABLE";
+          loadEl.style.color = ""; 
+        }
+      }, 1500); 
+    }
+
+    // --- Contact Protocol ---
     function runContactProtocol() {
-      const u = "kgrx";   // Replace with your email prefix
-      const d = "protonmail.com"; // Replace with your domain
+      const u = "yourname";   
+      const d = "email.com"; 
       window.location.href = `mailto:${u}@${d}`;
     }
 
     // --- Initialization ---
     window.switchBank = switchBank;
-    window.runContactProtocol = runContactProtocol; // Expose to onclick
+    window.runContactProtocol = runContactProtocol;
     
     switchBank('BANK_01');
+    startSystemHeartbeat();
 
     const dateDisplay = document.getElementById('current-date');
     dateDisplay.innerText = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
