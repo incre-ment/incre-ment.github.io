@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +10,9 @@
   <meta name="keywords" content="incre_ment, shader gallery, WebGL, generative art, GLSL, fragment shaders, creative coding">
   
   <style>
-    body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 20px; }
-    header { text-align: center; margin-bottom: 40px; }
+    body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 0; }
+    
+    header { text-align: center; margin-bottom: 40px; padding: 0 20px; }
     h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 10px; }
     
     .header-metadata {
@@ -22,18 +24,19 @@
       text-transform: uppercase;
     }
 
-    nav { text-align: center; margin-bottom: 60px; font-family: monospace; }
+    nav { text-align: center; margin-bottom: 60px; font-family: monospace; padding: 0 20px; }
 
     .nav-link {
       color: #444;
       text-decoration: none;
-      margin: 0 15px;
+      margin: 0 10px;
       font-size: 0.8rem;
       letter-spacing: 2px;
       transition: all 0.3s ease;
       cursor: pointer;
       border: 1px solid transparent;
       padding: 5px 10px;
+      display: inline-block;
     }
 
     .nav-link:hover, .nav-link.active {
@@ -53,13 +56,17 @@
       50% { opacity: 0.4; }
     }
     
+    /* Gallery Grid - Now Responsive */
     .gallery { 
       display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+      /* Uses min(450px, 100%) to ensure it never exceeds phone width */
+      grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr)); 
       gap: 30px; 
       max-width: 1400px; 
       margin: 0 auto;
+      padding: 0 20px;
       transition: opacity 0.2s ease;
+      box-sizing: border-box;
     }
 
     .card { 
@@ -70,6 +77,7 @@
       display: flex; 
       flex-direction: column; 
       position: relative;
+      width: 100%;
     }
 
     .card::before {
@@ -164,7 +172,19 @@
       text-align: justify;
       letter-spacing: 0.5px;
     }
-    .manifest-content strong { color: #2a2a2a; font-weight: normal; }
+
+    /* Mobile Responsive Overrides */
+    @media (max-width: 600px) {
+      body { padding: 20px 0; }
+      h1 { font-size: 1.4rem; letter-spacing: 5px; }
+      .header-metadata { font-size: 0.6rem; letter-spacing: 1px; }
+      .gallery { 
+        grid-template-columns: 1fr; /* Single column on mobile */
+        padding: 0 15px; 
+        gap: 20px;
+      }
+      .nav-link { margin: 5px; font-size: 0.7rem; }
+    }
   </style>
 </head>
 <body>
@@ -271,7 +291,6 @@
       const gl = canvas.getContext('webgl');
       if (!gl) return;
 
-      // Enable standard derivatives for fwidth() support
       gl.getExtension('OES_standard_derivatives');
 
       try {
