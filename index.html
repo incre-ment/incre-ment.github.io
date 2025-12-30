@@ -1,232 +1,104 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>incre_ment | procedural gallery</title>
-  
-  <meta name="description" content="incre_ment | A high-performance gallery of GLSL shaders and real-time procedural art. Low bandwidth, GPU-accelerated generative nodes.">
-  <meta name="keywords" content="incre_ment, shader gallery, WebGL, generative art, GLSL, fragment shaders, creative coding">
-  
   <style>
-    body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 0; }
+    body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; margin: 0; padding: 40px 0; overflow-x: hidden; }
     
     header { text-align: center; margin-bottom: 40px; padding: 0 20px; }
     h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 10px; }
     
-    .header-metadata {
-      font-family: monospace;
-      font-size: 0.7rem;
-      color: #888;
-      letter-spacing: 2px;
-      word-spacing: 5px;
-      text-transform: uppercase;
-    }
+    .header-metadata { font-family: monospace; font-size: 0.7rem; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+    .status-active { color: #f0f0f0; font-weight: bold; animation: pulse 3s infinite ease-in-out; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    nav { text-align: center; margin-bottom: 60px; font-family: monospace; padding: 0 20px; }
+    nav { text-align: center; margin-bottom: 60px; font-family: monospace; z-index: 10; position: relative; }
+    .nav-link { color: #444; text-decoration: none; margin: 0 10px; font-size: 0.8rem; letter-spacing: 2px; transition: all 0.3s ease; cursor: pointer; border: 1px solid transparent; padding: 5px 10px; display: inline-block; }
+    .nav-link:hover, .nav-link.active { color: #fff; border: 1px solid #333; background: #111; }
 
-    .nav-link {
-      color: #444;
-      text-decoration: none;
-      margin: 0 10px;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      transition: all 0.3s ease;
+    /* Side Navigation Buttons */
+    .bank-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #222;
+      font-size: 3rem;
+      font-weight: 100;
       cursor: pointer;
-      border: 1px solid transparent;
-      padding: 5px 10px;
-      display: inline-block;
+      padding: 20px;
+      transition: all 0.3s ease;
+      z-index: 100;
+      user-select: none;
     }
+    .bank-arrow:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    .arrow-left { left: 10px; }
+    .arrow-right { right: 10px; }
 
-    .nav-link:hover, .nav-link.active {
-      color: #fff;
-      border: 1px solid #333;
-      background: #111;
-    }
-
-    .status-active {
-      color: #f0f0f0;
-      font-weight: bold;
-      animation: pulse 3s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    
-    /* Gallery Grid - Now Responsive */
+    /* Gallery Grid */
     .gallery { 
       display: grid; 
-      /* Uses min(450px, 100%) to ensure it never exceeds phone width */
       grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr)); 
       gap: 30px; 
       max-width: 1400px; 
       margin: 0 auto;
-      padding: 0 20px;
-      transition: opacity 0.2s ease;
+      padding: 0 60px; 
+      transition: opacity 0.3s ease;
       box-sizing: border-box;
     }
 
-    .card { 
-      background: #151515; 
-      border: 1px solid #222; 
-      border-radius: 4px; 
-      overflow: hidden; 
-      display: flex; 
-      flex-direction: column; 
-      position: relative;
-      width: 100%;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      width: 12px;
-      height: 12px;
-      border-top: 2px solid #444;
-      border-left: 2px solid #444;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .card-info::after {
-      content: "";
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
-      width: 12px;
-      height: 12px;
-      border-bottom: 2px solid #444;
-      border-right: 2px solid #444;
-      pointer-events: none;
-    }
-    
-    canvas { 
-      width: 100%; 
-      aspect-ratio: 16 / 9; 
-      display: block; 
-      background-color: #000; 
-    }
+    .card { background: #151515; border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; position: relative; width: 100%; }
+    canvas { width: 100%; aspect-ratio: 16 / 9; display: block; background-color: #000; }
     
     .card-info { padding: 15px; border-top: 1px solid #222; position: relative; }
     .card-title { font-size: 0.9rem; margin: 0; color: #ddd; letter-spacing: 1px; }
-
-    .card-link {
-      display: inline-block;
-      margin-top: 8px;
-      font-size: 0.7rem;
-      color: #666;
-      text-decoration: none;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      transition: color 0.3s ease;
-    }
-
+    .card-link { display: inline-block; margin-top: 8px; font-size: 0.7rem; color: #666; text-decoration: none; text-transform: uppercase; transition: color 0.3s ease; }
     .card-link:hover { color: #fff; }
 
-    .fps-counter {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-family: monospace;
-      font-size: 0.7rem;
-      color: #666;
-      opacity: 0.8;
-      letter-spacing: 0.5px;
-      text-align: right;
-    }
+    .fps-counter { position: absolute; top: 15px; right: 15px; font-family: monospace; font-size: 0.7rem; color: #666; opacity: 0.8; }
 
-    footer {
-      margin-top: 80px;
-      text-align: center;
-      font-family: monospace;
-      border-top: 1px solid #222;
-      padding: 40px 20px;
-      opacity: 0.8;
-    }
+    footer { margin-top: 80px; text-align: center; font-family: monospace; border-top: 1px solid #222; padding: 40px 20px; }
+    .cmd-link { color: #888; text-decoration: none; padding: 5px 12px; transition: all 0.2s ease; font-size: 0.75rem; cursor: pointer; border: 1px solid transparent; }
+    .cmd-link:hover { color: #000; background: #f0f0f0; }
 
-    .cmd-link {
-      color: #888;
-      text-decoration: none;
-      padding: 5px 12px;
-      margin: 0 5px;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
-      font-size: 0.75rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-    }
-
-    .cmd-link:hover { color: #000; background: #f0f0f0; border: 1px solid #f0f0f0; }
-
-    .system-manifest { max-width: 800px; margin: 60px auto 0; padding: 20px; font-family: monospace; }
-    .manifest-content h3 { font-size: 0.7rem; color: #222; margin-bottom: 10px; text-align: center; }
-    .manifest-content p {
-      font-size: 0.6rem;
-      line-height: 1.6;
-      color: #1a1a1a;
-      text-align: justify;
-      letter-spacing: 0.5px;
-    }
-
-    /* Mobile Responsive Overrides */
-    @media (max-width: 600px) {
-      body { padding: 20px 0; }
-      h1 { font-size: 1.4rem; letter-spacing: 5px; }
-      .header-metadata { font-size: 0.6rem; letter-spacing: 1px; }
-      .gallery { 
-        grid-template-columns: 1fr; /* Single column on mobile */
-        padding: 0 15px; 
-        gap: 20px;
-      }
-      .nav-link { margin: 5px; font-size: 0.7rem; }
+    /* Mobile Responsive */
+    @media (max-width: 700px) {
+      .bank-arrow { font-size: 2rem; padding: 10px; background: rgba(10,10,10,0.5); border-radius: 50%; }
+      .gallery { padding: 0 15px; grid-template-columns: 1fr; }
+      .card-info { display: flex; flex-direction: column; gap: 5px; }
+      .fps-counter { position: static; text-align: left; opacity: 0.5; font-size: 0.6rem; }
     }
   </style>
 </head>
 <body>
 
+  <button class="bank-arrow arrow-left" onclick="cycleBank(-1)">&#8249;</button>
+  <button class="bank-arrow arrow-right" onclick="cycleBank(1)">&#8250;</button>
+
   <header>
     <h1>incre_ment</h1>
-    <div class="header-metadata">
-      STATUS: <span class="status-active">ACTIVE</span> // 
-      GPU_LOAD: STABLE // 
-      NODES: 12 // 
-      <span id="current-date">0000.00.00</span>
-    </div>
+    <div class="header-metadata">STATUS: <span class="status-active">ACTIVE</span> // GPU_LOAD: STABLE // <span id="current-date">0000.00.00</span></div>
   </header>
 
   <nav id="bank-nav">
-    <span class="nav-link active" onclick="switchBank('BANK_01')">[ BANK_01 ]</span>
-    <span class="nav-link" onclick="switchBank('BANK_02')">[ BANK_02 ]</span>
-    <span class="nav-link" onclick="switchBank('BANK_03')">[ BANK_03 ]</span>
+    <span class="nav-link active" onclick="setBank(0)">[ BANK_01 ]</span>
+    <span class="nav-link" onclick="setBank(1)">[ BANK_02 ]</span>
+    <span class="nav-link" onclick="setBank(2)">[ BANK_03 ]</span>
   </nav>
 
   <main class="gallery" id="mainframe-grid"></main>
 
   <footer>
-    <p style="font-size: 0.7rem; letter-spacing: 1px; color: #444;">
-      <a class="cmd-link" onclick="runContactProtocol()">CONTACT</a> 
-    </p>
+    <a class="cmd-link" onclick="runContactProtocol()">CONTACT_PROTOCOL</a>
   </footer>
 
-  <section class="system-manifest">
-    <div class="manifest-content">
-      <h3>// SYSTEM_MANIFEST.TXT</h3>
-      <p>
-        This is a high-performance, low-bandwidth <strong>procedural gallery by incre_ment</strong>. 
-        It is dedicated to the exploration of <strong>GLSL fragment shaders</strong> and <strong>real-time generative art</strong>. 
-        Each node in this <strong>WebGL gallery</strong> is rendered live on the GPU using custom <strong>fragment shaders</strong>, 
-        showcasing the intersection of mathematics and digital aesthetics. 
-        This collection of <strong>creative coding</strong> experiments is open-source and hosted via <strong>GitHub Pages</strong>.
-      </p>
-    </div>
-  </section>
-
   <script type="module">
+    const banks = ["BANK_01", "BANK_02", "BANK_03"];
+    let currentBankIndex = 0;
+
     const memoryBanks = {
       "BANK_01": [
         { id: "triangles", title: "001: LOADING LOADING LOADING", file: "triangles.frag", link: "lc3cRN" },
@@ -240,135 +112,118 @@
         { id: "vortex", title: "007: VORTEX EXPERIMENT", file: "vortex.frag", link: "DsK3Wz" },
         { id: "block", title: "008: BLOCK TRANSFER", file: "blocks.frag", link: "4fKGWD" }
       ],
-       "BANK_03": [
+      "BANK_03": [
         { id: "grass", title: "009: MIDNIGHT FLOW", file: "grass.frag", link: "M3jyRV" },
         { id: "blockfall", title: "010: BLOCK FALL", file: "blockfall.frag", link: "X3cyz2" },
         { id: "rain", title: "011: PRIMITIVE RAIN", file: "rain.frag", link: "lXXXWr" },
         { id: "wavycube", title: "012: WAVY CUBE", file: "wavy_cube.frag", link: "WfXGRX" }
-       ]
+      ]
     };
 
-    let activeAnimationFrames = [];
+    let activeFrames = [];
 
-    async function switchBank(bankKey) {
+    function setBank(index) {
+      currentBankIndex = index;
+      const bankKey = banks[currentBankIndex];
       const grid = document.getElementById('mainframe-grid');
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('onclick').includes(bankKey)) {
-          link.classList.add('active');
-        }
+      
+      document.querySelectorAll('.nav-link').forEach((link, i) => {
+        link.classList.toggle('active', i === index);
       });
 
       grid.style.opacity = '0';
-      activeAnimationFrames.forEach(id => cancelAnimationFrame(id));
-      activeAnimationFrames = [];
+      activeFrames.forEach(id => cancelAnimationFrame(id));
+      activeFrames = [];
 
-      setTimeout(async () => {
+      setTimeout(() => {
         grid.innerHTML = '';
-        const shaders = memoryBanks[bankKey];
-        if (!shaders) return;
-
-        for (const data of shaders) {
+        memoryBanks[bankKey].forEach(data => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
             <canvas id="canvas-${data.id}"></canvas>
             <div class="card-info">
               <p class="card-title">${data.title}</p>
-              <div class="fps-counter" id="fps-canvas-${data.id}">[ -- FPS ] [ --MS ]</div>
-              <a href="https://www.shadertoy.com/view/${data.link}" target="_blank" class="card-link">View on Shadertoy →</a>
+              <div class="fps-counter" id="fps-canvas-${data.id}">[ -- FPS ]</div>
+              <a href="https://www.shadertoy.com/view/${data.link}" target="_blank" class="card-link">View Source →</a>
             </div>
           `;
           grid.appendChild(card);
           initShader(`canvas-${data.id}`, data.file);
-        }
+        });
         grid.style.opacity = '1';
-      }, 200);
+      }, 300);
+    }
+
+    function cycleBank(dir) {
+      let newIndex = currentBankIndex + dir;
+      if (newIndex < 0) newIndex = banks.length - 1;
+      if (newIndex >= banks.length) newIndex = 0;
+      setBank(newIndex);
     }
 
     async function initShader(canvasId, fragFileName) {
       const canvas = document.getElementById(canvasId);
       const gl = canvas.getContext('webgl');
       if (!gl) return;
-
       gl.getExtension('OES_standard_derivatives');
 
-      try {
-        const response = await fetch(`shaders/${fragFileName}`);
-        const fragmentSource = await response.text();
-        const vertexSource = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+      const response = await fetch(`shaders/${fragFileName}`);
+      const fragmentSource = await response.text();
+      const vertexSource = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
 
-        function createShader(gl, type, source) {
-          const s = gl.createShader(type);
-          gl.shaderSource(s, source);
-          gl.compileShader(s);
-          return s;
+      const program = gl.createProgram();
+      const vs = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vs, vertexSource); gl.compileShader(vs);
+      const fs = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fs, fragmentSource); gl.compileShader(fs);
+      gl.attachShader(program, vs); gl.attachShader(program, fs);
+      gl.linkProgram(program); gl.useProgram(program);
+
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+      const pos = gl.getAttribLocation(program, "position");
+      gl.enableVertexAttribArray(pos);
+      gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+      const timeLoc = gl.getUniformLocation(program, "u_time");
+      const resLoc = gl.getUniformLocation(program, "u_resolution");
+
+      let lastFpsUpdate = 0;
+      let frames = 0;
+
+      function render(time) {
+        if (!document.getElementById(canvasId)) return;
+        frames++;
+        if (time - lastFpsUpdate > 1000) {
+          const fpsDisplay = document.getElementById(`fps-${canvasId}`);
+          if (fpsDisplay) fpsDisplay.innerText = `[ ${frames} FPS ]`;
+          frames = 0; lastFpsUpdate = time;
         }
 
-        const program = gl.createProgram();
-        gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vertexSource));
-        gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fragmentSource));
-        gl.linkProgram(program);
-        gl.useProgram(program);
-
-        const buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
-        const pos = gl.getAttribLocation(program, "position");
-        gl.enableVertexAttribArray(pos);
-        gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-
-        const timeLoc = gl.getUniformLocation(program, "u_time");
-        const resLoc = gl.getUniformLocation(program, "u_resolution");
-
-        let lastTime = 0;
-        let frameCount = 0;
-        let lastFpsUpdate = 0;
-
-        function render(time) {
-          if (!document.getElementById(canvasId)) return;
-          const deltaTime = time - lastTime;
-          lastTime = time;
-          frameCount++;
-
-          if (time - lastFpsUpdate > 500) {
-            const fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
-            const fpsDisplay = document.getElementById(`fps-${canvasId}`);
-            if (fpsDisplay) fpsDisplay.innerText = `[ ${fps} FPS ] [ ${deltaTime.toFixed(1)}MS ]`;
-            lastFpsUpdate = time;
-            frameCount = 0;
-          }
-
-          if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-          }
-          
-          gl.viewport(0, 0, canvas.width, canvas.height);
-          gl.uniform1f(timeLoc, time * 0.001);
-          gl.uniform2f(resLoc, canvas.width, canvas.height);
-          gl.drawArrays(gl.TRIANGLES, 0, 6);
-          
-          const frameId = requestAnimationFrame(render);
-          activeAnimationFrames.push(frameId);
-          if (activeAnimationFrames.length > 50) activeAnimationFrames.shift();
+        if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+          canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
         }
-        activeAnimationFrames.push(requestAnimationFrame(render));
-      } catch (err) { console.error(err); }
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform1f(timeLoc, time * 0.001);
+        gl.uniform2f(resLoc, canvas.width, canvas.height);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        activeFrames.push(requestAnimationFrame(render));
+      }
+      activeFrames.push(requestAnimationFrame(render));
     }
 
     function runContactProtocol() {
-      const u = "kgrx";
-      const d = "protonmail.com";
-      window.location.href = `mailto:${u}@${d}`;
+      const email = "kgrx@protonmail.com";
+      window.location.href = "mailto:" + email;
     }
 
-    window.switchBank = switchBank;
-    window.runContactProtocol = runContactProtocol; 
-    switchBank('BANK_01');
-
-    const dateDisplay = document.getElementById('current-date');
-    dateDisplay.innerText = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+    window.setBank = setBank;
+    window.cycleBank = cycleBank;
+    window.runContactProtocol = runContactProtocol;
+    setBank(0);
+    document.getElementById('current-date').innerText = new Date().toISOString().slice(0,10).replace(/-/g,'.');
   </script>
 </body>
 </html>
